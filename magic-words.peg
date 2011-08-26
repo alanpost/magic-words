@@ -1,0 +1,957 @@
+;;; Terminology
+;;;
+;;; jmina          - The fundamental operation of a Magic Word.  A magic
+;;;                  word is combined with other words to the left or
+;;;                  right of it to form a phrase word.
+;;;
+;;; simlu valsi    - Once a magic word has been combined with others words
+;;;                  it becomes a jufpau valsi.  A jufpau valsi is considered
+;;;                  a single word by the rest of the grammar.
+;;;
+;;; su'o re valsi  - LOhU and ZOI are unique in that they can quote multiple
+;;; ke jmina valsi   words.  This leads to a special case with SA and SU,
+;;;                  which also quote multiple words.
+;;;                  Specifically, an unterminated LOhU or ZOI cannot be
+;;;                  detected for purposes of SA or SU processing.  SA and
+;;;                  SU are otherwise able to handle ungrammatical statements.
+;;;
+;;;                  I also believe BU should be forbidden after these
+;;;                  Magic Word Phrases, as LOhU and ZOI can be arbitrarily
+;;;                  long.  You don't know until the end that the phrase
+;;;                  will be converted by BU.
+;;;
+;;; vimcu valsi    - For SA, SI, and SU, the jufpau valsi is removed
+;;;                  from the grammar.  These erase words are one of
+;;;                  two classes of magic words.  All vimcu valsi are
+;;;                  makfa valsi.
+;;;
+;;; vajni porsi    - Magic words are processed in order of precedence,
+;;;                  or vajni porsi.  This precedence determines which
+;;;                  magic word is used to create a jufpau valsi.
+;;;
+;;; ckini porsi    - For magic words with the same precedence, the
+;;;                  associativity, or ckini farna, determines which
+;;;                  order magic words are combined.  For instance,
+;;;                  {zo bu} is the "bu" quote, rather than the zo letteral.
+;;;                  All Magic Word processing is done left-to-right,
+;;;                  subject to precedence rules, so this table is included
+;;;                  for completeness rather than for information.
+;;;
+;;; vajni porsi lo mafka valsi
+;;;
+;;; selma'o  klesi  vajni  jmina farna          ckini farna
+;;;                 porsi
+;;;   FAhO  jufpau     pa  selyli'e             lo lidne lo selyli'e cu purci
+;;;   BU    jufpau     re  lidne                lo lidne lo selyli'e cu purci
+;;;   LOhU  jufpau     re  selyli'e             lo lidne lo selyli'e cu purci
+;;;   LEhU  jufpau     re  lidne                lo lidne lo selyli'e cu purci
+;;;   ZO    jufpau     re  selyli'e             lo lidne lo selyli'e cu purci
+;;;   ZOI   jufpau     re  selyli'e             lo lidne lo selyli'e cu purci
+;;;   ZEI   jufpau     ci  lidne ce'o selyli'e  lo lidne lo selyli'e cu purci
+;;;   SA    vimcu      vo  lidne ce'o selyli'e  lo lidne lo selyli'e cu purci
+;;;   SI    vimcu      vo  selyli'e             lo lidne lo selyli'e cu purci
+;;;   SU    vimcu      mu  selyli'e             lo lidne lo selyli'e cu purci
+;;;
+;;; selyli'e binding for FAhO and SA do not do Magic Word processing.
+;;;
+
+
+;; Some Magic Words operate on literal words, and do not do Magic
+;; Word processing (either vimcu valsi or jufpau valsi) while they
+;; are consuming input.  These are:
+;;
+;;   FAhO
+;;   LOhU ... LEhU
+;;   ZO
+;;   ZOI
+;;
+
+;; vimcu valsi
+;;
+;; sa, si, su are interesting in that they work on words, in some
+;; cases words that are only otherwise grammatical when used in 
+;; magic word constructs:  lu'e and bu.  This means that these words
+;; must be recognized both within pseudo words and as regular words.
+;;
+
+
+;;
+;; BU
+;;
+;; BU binds to the word or word phrase to the left.  All BU Magic Word
+;; Phrases are in selma'o BY.
+;;
+;; SA handling is unique here because this Magic Word Phrase is in selma'o
+;; BY.  SA handling must detect both single-word BY selma'o and Magic Word
+;; Phrase BY selma'o.
+;;
+;; Magic Word interaction with BU
+;;
+;;   BU          - not permitted, bu can't bind just to itself.
+;;   FAhO        - not permitted, FAhO wins.
+;;   LOhU        - not permitted, should be a LOhU ... LEhU quote.
+;;   LEhU        - not permitted as potentially confusing.
+;;   SA          - not permitted, SA wins and erases.
+;;   SI          - not permitted, SI wins and erases.
+;;   SU          - not permitted, SU wins and erases.
+;;   ZO          - not permitted, ZO wins.
+;;   ZOI         - not permitted, should have swallowed bu.
+;;   ZEI         - not permitted, ZEI wins.
+;;
+;; Magic Word Phrase interaction with BU
+;;
+;;   BY          - not permitted.
+;;   LOhU-jufpau - not permitted.
+;;   LEhU-jufpau - not permitted.
+;;   SA-jufpau   - not permitted.
+;;   SI-jufpau   - not permitted.
+;;   SU-jufpau   - not permitted.
+;;   ZO-jufpau   - not permitted.
+;;   ZOI-jufpau  - not permitted.
+;;   ZEI-jufpau  - not permitted.
+;;
+;;
+
+;;
+;; FAhO
+;;
+;; FAhO does not recognize anything coming after it.
+;;
+
+;;
+;; LOhU ... LEhU
+;;
+;; LOhU ... LEhU are used to quote ungrammatical text.  No Magic Word
+;; processing is done inside LOhU...LEhU, it deals only with words.
+;;
+
+;;
+;; SA
+;;
+;; FAhO cannot be followed by SA, so it is not present here.
+;;
+;; The initial-sa rule is looking for a SA following a selma'o
+;; that hasn't appear in the input before the SA.  In these
+;; cases we backtrack to the beginning of the text.
+;;
+;;   "sa sa", "sa si", "sa su"
+;;
+;; For Magic Words that follow SA, we have two distinct cases.
+;; If we have {zo broda sa zo}, we back up to the last zo, even
+;; if the second zo is not a zo-clause.  We will then proceed
+;; to try to make a zo-clause out of the words after the second
+;; zo.
+;;
+;; This is different for Magic Words that affect the word before
+;; them.  {zo broda sa si} erases to the previous si, which has
+;; already been erased.  What about non-erasure cases, like
+;; {broda bu sa bu}?  We want to back up to the bu, and not detect
+;; it as a BU-clause.
+;;
+;; Magic Words that follow after SA are a bit weird.  We can
+;; have an erasure in the middle of a magic word phrase:
+;;
+;;  broda (brode (brodi sa brodo) si) bu
+;;   => broda bu
+;;
+;; initial-sa is grouped with initial-si and initial-su, and
+;; it doesn't need to check for those conditions (which revert,
+;; after magic word processing, to initial-si or initial-su.
+;;
+
+;;
+;; SI
+;;
+;; process any si words or si clauses at the beginning of the
+;; text.
+;;
+;; also, SI can never erase past a FAhO (though in can
+;; do so if that FAhO is in a pseudo-word.)
+;;
+;; SA SI is a special case that *should* be handled by SA, but
+;; we should be sure to check SA before SI and make sure that
+;; |valsi| does not contain SA in it.
+;;
+;;   BU          - BU is not permitted.  Oddly, we permit
+;;                 BU in some cases that we don't detect
+;;                 here, particularly SA. XXX
+;;   FAhO        - FAhO is not permitted.
+;;   LOhU        - LOhU is not permitted.
+;;   LEhU        - LEhU is not permitted.
+;;   SA          - initial SA is permitted.
+;;   SI          - initial SI is permitted.
+;;   SU          - SU is not permitted.
+;;   ZO          - ZO is not permitted.
+;;   ZOI         - ZOI is not permitted.
+;;   ZEI         - ZEI is not permitted.
+;;
+;;   BY          - BY is considered a word.
+;;   BY-clause   - BY-clause is considered a word.
+;;   FAhO-clause - not possible.
+;;   LOhU-clause - LOhU-clause is considered a word.
+;;   LEhU-clause - LEhU-clause is considered a word.
+;;   SA-clause   - not possible.
+;;   SI-clause   - SI-clause is considered a word.
+;;   SU-genpau   - not possible.
+;;   ZO-clause   - ZO-clause is considered a word.
+;;   ZOI-clause  - ZOI-clause is considered a word.
+;;   ZEI-clause  - ZEI-clause is considered a word.
+;;
+;;
+;; XXX: broda si sa si
+;;
+;; Here I won't detect sa si as an initial-sa, because I have the
+;; si in there already.  In fact, (broda si) is erased, and that
+;; needs to happen as I'm searching for a {sa si}
+;;
+;; There is a general problem with all magic word phrases that
+;; occur after SA, as I need to treat them as literal magic words.
+;;
+
+;;
+;; SU
+;;
+;; su erases everything before it, and has a larger
+;; scope than either SA or SI: we may pass over
+;; a series of SA clauses that we would process if
+;; su were not present.  Should we skip SU-genpau when we
+;; find a SA?  Is there some problem skipping over SA that
+;; we won't detect and should, like our other grammar errors?
+;;
+;; SU-genpau is only checked at the beginning of the text,
+;; so once we've processed all SU-genpau the only remaining
+;; ones will be quoted or part of an ungrammatical text.
+;;
+;; when doing sa, si, su matching, it is important not to read
+;; after FAhO.
+;;
+;; That means the interaction between these words needs
+;; to be checked:
+;;
+;; SA SU broda sa su
+;;
+;; sa su erases back to the previous su, which is always
+;; a backtrace to the beginning of the text, just as the
+;; su would be.
+;;
+;; SI SU broda si su
+;;
+;; also, SU is never processed after a FAhO (though it
+;; can do so if that FAhO is in a pseudo-word.)
+;;
+;;   BU          - BU is not permitted.  Oddly, we permit
+;;                 BU in some cases that we don't detect
+;;                 here, particularly SA. XXX
+;;   FAhO        - FAhO is not permitted.
+;;   LOhU        - LOhU is not permitted.
+;;   LEhU        - LEhU is not permitted.
+;;   SA          - initial SA is permitted.
+;;   SI          - initial SI is permitted.
+;;   SU          - SU is not permitted.
+;;   ZO          - ZO is not permitted.
+;;   ZOI         - ZOI is not permitted.
+;;   ZEI         - ZEI is not permitted.
+;;
+;;   BY          - BY is considered a word.
+;;   BU-clause   - BY-clause is considered a word.
+;;   FAhO-clause - not possible.
+;;   LOhU-clause - LOhU-clause is considered a word.
+;;   LEhU-clause - LEhU-clause is considered a word.
+;;   SA-clause   - not possible.
+;;   SI-clause   - SI-clause is considered a word.
+;;   SU-genpau   - not possible.
+;;   ZO-clause   - ZO-clause is considered a word.
+;;   ZOI-clause  - ZOI-clause is considered a word.
+;;   ZEI-clause  - ZEI-clause is considered a word.
+;;
+;; The major take-away from this chart is that a grammatically
+;; incorrect BU-clause, LOhU, ZOI, ZEI are grammar errors that
+;; will prevent SU from working.  This avoids cases like this:
+;;
+;;  zo .gy. su
+;;
+;; An ungrammatical BU could be permitted.  Should we permit this?
+;; can SI be used to quote a word that otherwise we wouldn't permit
+;; here?
+;;
+
+;;
+;; ZEI
+;;
+;; ZEI has a lower precedence that all other non-erasing Magic Words.
+;; This is done to preserve the following property:
+;;
+;; ZEI binds Magic Word Phrases, but cannot bind Magic Words.  ZEI
+;; binds equally on the left or right, with the exception that the
+;; last element in ZEI can be BU.
+;;
+;; For the second and subsequent place of ZEI, we don't
+;; permit anything that can't also appear in the first
+;; place:
+;;
+;;  BU
+;;  BU-clause
+;;  FAhO
+;;  LOhU (the word, LOhU-clause is fine)
+;;  LEhU
+;;  SA
+;;  SI
+;;  SU
+;;  ZO (the word, ZO-clause is fine)
+;;  ZOI (the word, ZOI-clause is fine)
+;;
+;;   BU          - not permitted?  Permitted only in second clause?
+;;   LOhU        - not permitted.
+;;   LEhU        - not permitted.
+;;   SA          - not permitted.
+;;   SI          - not permitted.
+;;   SU          - not permitted.
+;;   ZO          - not permitted.
+;;   ZOI         - not permitted.
+;;   ZEI         - not permitted.
+;;
+;;   BY          - BY is considered a word.
+;;   BY-clause   - BY-clause is considered a word.
+;;   LOhU-clause - permitted.
+;;   LEhU-clause - permitted.
+;;   SA-clause   - not permitted.
+;;   SI-clause   - not permitted.
+;;   SU-genpau   - not permitted.
+;;   ZO-clause   - not permitted.
+;;   ZOI-clause  - permitted.
+;;   ZEI-clause  - not permitted.
+;;
+
+;;
+;; ZO
+;;
+;; ZO quotes a single Lojban word.  Because of the precedence rules,
+;; no Magic Word construction is attempted before ZO quotes.  ZO can
+;; quote any other Magic Word, but cannot quote any Magic Word Phrase.
+;;
+;;   BU          - BU is quoted.
+;;   FAhO        - FAhO is quoted.
+;;   LOhU        - LOhU is quoted.
+;;   LEhU        - LEhU is quoted.
+;;   SA          - SA is quoted.
+;;   SI          - SI is quoted.
+;;   SU          - SU is quoted.
+;;   ZO          - ZO is quoted.
+;;   ZOI         - ZOI is quoted.
+;;   ZEI         - ZEI is quoted.
+;;
+;;   BY          - BY is quoted.
+;;   BU-clause   - not possible.
+;;   FAhO-clause - not possible.
+;;   LOhU-clause - not possible.
+;;   LEhU-clause - not possible.
+;;   SA-clause   - not possible.
+;;   SI-clause   - not possible.
+;;   SU-genpau   - not possible.
+;;   ZO-clause   - not possible.
+;;   ZOI-clause  - not possible.
+;;   ZEI-clause  - not possible.
+;;
+
+;;
+;; ZOI
+;;
+;; ZOI is used to quote ungrammatical text.  No Magic Word processing
+;; is done inside ZOI, it deals only with words.
+;;
+;;   BU          - BU is quoted.
+;;   LOhU        - LOhU is quoted.
+;;   LEhU        - LEhU is quoted.
+;;   SA          - SA is quoted.
+;;   SI          - SI is quoted.
+;;   SU          - SU is quoted.
+;;   ZO          - ZO is quoted.
+;;   ZOI         - ZOI is quoted.
+;;   ZEI         - ZEI is quoted.
+;;
+;;   BY          - BY is quoted.
+;;   BU-clause   - not possible.
+;;   LOhU-clause - not possible.
+;;   LEhU-clause - not possible.
+;;   SA-clause   - not possible.
+;;   SI-clause   - not possible.
+;;   SU-genpau   - not possible.
+;;   ZO-clause   - not possible.
+;;   ZOI-clause  - not possible.
+;;   ZEI-clause  - not possible.
+;;
+
+         ; {sa broda}, with no broda in front of it, erases to
+         ; the beginning.
+gerna <- ( initial-su
+         / initial-sa
+         / initial-si
+         / initial-y )*
+         ; SA+FAhO is a special case, handled here.
+         initial-sa-FAhO?
+         valsi-genpau*
+         FAhO-genpau?
+         `EOF?
+      -> gerna
+
+BAhE  <- ,"ba'e"    `space? -> BAhE
+BU    <- ,"bu"      `space? -> BU
+BY    <- ,"by"      `space? -> BY
+FAhO  <- ,"fa'o"    `space? -> FAhO
+GISMU <- ,"broda"   `space? -> GISMU
+       / ,"brode"   `space? -> GISMU
+       / ,"brodi"   `space? -> GISMU
+       / ,"brodo"   `space? -> GISMU
+       / ,"brodu"   `space? -> GISMU
+LOhU  <- ,"lo'u"    `space? -> LOhU
+LEhU  <- ,"le'u"    `space? -> LEhU
+SA    <- ,"sa"      `space? -> SA
+SI    <- ,"si"      `space? -> SI
+SU    <- ,"su"      `space? -> SU
+Y     <- ,"y"       `space? -> Y
+ZEI   <- ,"zei"     `space? -> ZEI
+ZO    <- !ZOI ,"zo" `space? -> ZO
+ZOI   <- ,"zoi"     `space? -> ZOI
+
+space <- [[:jboca'u:]]+
+EOF   <- !.
+
+;;
+;; Internal implementation
+;;
+;; *-genpau: This rule is the fully constructed word, after Magic
+;;           Word processing (both erasure and pseudo-word creation).
+;;           It is used in the grammar to represent the specific word
+;;           class.  BAhE is processed here, as BAhE is not erased by
+;;           A SA clause erasing the emphasized word.
+;;
+;; *-vimpau: SA handling, which is specific to each word class.  SA
+;;           handling works after pseudo-word construction
+;;
+;; *-mlupau: Used to mask right-binding magic words that might
+;;           contain this word.  It makes sure that {broda bu} is
+;;           matched by BU rather than GISMU.
+;;
+;; *-mluvla: Construct the pseudo-word for this word class.  A
+;;           pseudo might consist of multiple words (LOhU, ZOI, ZO)
+;;           and always includes SI and Y processing.
+;;
+;; *-sa:     This rule works with *-vimcu to perform the lookahead done
+;;           for SA processing.  It is constructed to also be used by
+;;           initial-sa, where the word class to be erased isn't
+;;           specified.  All magic word processing must be done while
+;;           performing lookahead.
+;;
+;; *-genvla: For BU, FAhO, LOhU, SA, ZEI, ZO, and ZOI: this is the
+;;           set of words this Magic Word is permitted to bind to in
+;;           order to create a pseudo word.
+;;           LEhU is the only Magic Word without a *-genvla production,
+;;           as it is part of the LOhU pseudo-word.
+;;
+
+;; broda (broda si) (broda sa) broda
+;;
+;; => broda broda
+;;
+GISMU-genpau <- BAhE-genpau? GISMU-vimpau
+             -> GISMU-genpau
+GISMU-vimpau <- ( GISMU-mlupau GISMU-sa &GISMU-mlupau )* GISMU-mlupau
+             -> GISMU-vimpau
+; XXX: this is really rather mluvlapau, long as that is.
+GISMU-mlupau <- !BU-mluvla !ZEI-mluvla GISMU-mluvla
+GISMU-mluvla <- GISMU vimcu-genpau?
+             -> GISMU-mluvla
+GISMU-sa     <- ( !GISMU-mlupau SA-genvla )*
+                ( GISMU-mlupau GISMU-sa )*
+                SA-genpau
+             -> GISMU-sa
+
+; this list consists of Magic Words that create pseudo-words.
+; It does not include Magic Words that erase.
+;
+; left-matching Magic Words must be placed before other productions
+;
+
+; a Lojban pseudo-word is a word after Magic Word processing, with the
+; following exceptions:
+;
+;  * FAhO is not included, as it is used as an end-of-input indicator.
+;  * SA handling is only done for selma'o which otherwise don't appear
+;    in the grammar.
+;  * SI is not included, as SI handling is done within individual
+;    Magic Word processing.
+;  * SU is not included, as SU is handled before this rule.
+;
+valsi-genpau <- BU-genpau
+              / BY-genpau
+              ; FAhO is checked after this production is
+              ; matched.
+              / GISMU-genpau
+              / LOhU-genpau
+              ; SA, SI, and SU handling is performed either 
+              ; in these other productions or before we match
+              ; this rule.
+              / Y-genpau
+              / ZEI-genpau
+              / ZO-genpau
+              / ZOI-genpau
+              ; must be last, because it is contained in every
+              ; other clause.
+              / BAhE-genpau
+
+; This construct is used by LOhU ... LEhU, ZOI, and ZO; all of which
+; read single words and don't try to create pseudo-words.
+;
+; It includes every valid Lojban word.
+;
+any-lojban-word <- BAhE
+                 / BU
+                 / BY
+                 / FAhO
+                 / GISMU
+                 / LOhU
+                 / LEhU
+                 / SA
+                 / SI
+                 / SU
+                 / Y
+                 / ZEI
+                 / ZO
+                 / ZOI
+
+; This rule cannot have certain magic words in it, as this
+; rule is used while parsing a magic word.  When using this
+; rule, magic words need to be checked for as well.
+;
+; If appropriate, both left-binding magic words, BU and ZEI, must
+; be checked before matching this production, as this production
+; would otherwise match the left-hand side of those magic words.
+;
+                 ; BU not included here, as this rule is used to
+                 ; construct BU-genpau.  ZEI checks for BU manually.
+paloroda-mluvla <- BY-mluvla
+                 ; FAhO is not included here, as it takes precedence
+                 / GISMU-mluvla
+                 / LOhU-mluvla
+                 / LEhU-mluvla
+                 ; SA, SI, and SU aren't included here, as they
+                 ; take precedence.
+                 / Y-mluvla
+                 ; ZEI not included here, as this rule is used to
+                 ; construct ZEI-genpau.  XXX: BU checks for ZEI
+                 ; manually?
+                 / ZO-mluvla
+                 / ZOI-mluvla
+
+; the words matched by the left-hand side of SA and SU.  the right
+; hand side of SA is processed by a different rule.  Since SI has
+; no left hand side matching, SI does not use this rule.
+;
+vimcu-genvla <- valsi-genpau
+              / bu-genpau   -> vimcu-genvla
+              / LEhU-genpau -> vimcu-genvla
+              ; XXX: I'm not sure if this can ever be matched, as
+              ; I'm not sure there is anything at all forbidden to
+              ; the right of {zo}.
+              / zo-genpau   -> vimcu-genvla
+              / zei-genpau  -> vimcu-genvla
+
+vimcu-genpau <- ( SI-genpau / Y-genpau )+
+
+;;
+;; BAhE
+;;
+BAhE-genpau  <- BAhE-vimpau
+             -> BAhE-genpau
+BAhE-vimpau  <- ( BAhE-mlupau BAhE-sa &BAhE-mlupau )* BAhE-mlupau
+             -> BAhE-vimpau
+; XXX: should I mask every single other *-mluvla here to make
+;      sure we truly have a naked BAhE?  I don't actually think
+;      even these masks are correct; why am I treating these
+;      special?  The problem is that I do permit SA handling
+;      for BAhE, so I can't as such mask anything here, but
+;      I also want to include these clauses in lists that have
+;      other words in them.  How do I determine that BAhE is
+;      all by itself and not part of a larger clause?
+;
+BAhE-mlupau  <- !BU-mluvla !ZEI-mluvla BAhE-mluvla
+BAhE-mluvla  <- ( BAhE vimcu-genpau? )+
+             -> BAhE-mluvla
+BAhE-sa      <- ( !BAhE-mlupau SA-genvla )*
+                ( BAhE-mlupau BAhE-sa )*
+                SA-genpau
+             -> BAhE-sa
+
+; bu-genpau only appears on the left-hand side of SA.
+;
+bu-genpau    <- bu-vimpau
+bu-vimpau    <- ( ( BU-mlupau / BY-mlupau / bu-mlupau )
+                  BU-sa
+                  &( BU-mlupau / BY-mlupau / bu-mlupau ) )*
+                bu-mlupau
+             -> bu-vimpau
+; XXX: are these exclusions needed?  Can I even match them?
+bu-mlupau    <- !BU-mluvla !ZEI-mluvla bu-mluvla
+bu-mluvla    <- BU vimcu-genpau?
+             -> bu-mluvla
+
+; {ba'e bu} is *not* the ba'e letteral.  We instead permit {broda
+; ba'e bu} to emphasize the bu-ness of the broda letteral.  {ba'e
+; bu} is emphasizing {bu}.
+;
+; the above is also consistent with {broda bu ba'e bu ba'e bu},
+; which emphasizes the second and third bu-ity of broda.  If {ba'e
+; bu} was the ba'e letteral, we would also have to forbid {ba'e}
+; before second and subsequent {bu} in a BU-genpau.
+;
+BU-genpau    <- BAhE-genpau? BU-vimpau
+             -> BU-genpau
+BU-vimpau    <- ( ( BU-mlupau / BY-mluvla / bu-mluvla )
+                  BU-sa
+                  &( BU-mlupau / BY-mlupau / bu-mlupau ) )*
+                BU-mlupau
+             -> BU-vimpau
+BU-mlupau    <- !ZEI-mluvla BU-mluvla
+BU-mluvla    <- BU-genvla ( BAhE-genpau? BU vimcu-genpau? )+
+             -> BU-mluvla
+              ; a ZEI letteral is not permitted, ZEI takes precedence.
+BU-genvla    <- paloroda-mluvla
+BU-sa        <- ( !( BU-mlupau / BY-mlupau / bu-mlupau ) SA-genvla )*
+                ( ( BU-mlupau / BY-mlupau / bu-mlupau ) BU-sa )*
+                SA-genpau
+             -> BU-sa
+
+
+;;
+;; BY
+;;
+BY-genpau    <- BAhE-genpau? BY-vimpau
+             -> BY-genpau
+BY-vimpau    <- ( ( BU-mlupau / BY-mlupau / bu-mlupau )
+                  BY-sa
+                  &( BU-mlupau / BY-mlupau / bu-mlupau ) )*
+                BY-mlupau
+             -> BY-vimpau
+BY-mlupau    <- !BU-mluvla !ZEI-mluvla BY-mluvla
+BY-mluvla    <- BY vimcu-genpau?
+             -> BY-mluvla
+BY-sa        <- ( !( BU-mlupau / BY-mlupau / bu-mlupau ) SA-genvla )*
+                ( ( BU-mlupau / BY-mlupau / bu-mlupau ) BY-sa )*
+                SA-genpau
+             -> BY-sa
+
+
+;;
+;; FAhO
+;;
+
+; the initial-sa case for FAhO is an exception.  It is permitted,
+; but additional initial-* clauses are not permitted.
+;
+FAhO-genpau  <- BAhE-genpau? FAhO-mluvla
+             -> FAhO-genpau
+; there is no FAhO-vimpau as the precedence of FAhO is higher than any
+; erase words.  FAhO can't be erased.
+FAhO-mlupau  <- FAhO-mluvla
+FAhO-mluvla  <- FAhO FAhO-genvla
+             -> FAhO-mluvla
+FAhO-genvla  <- `.*
+; only used by initial-sa-FAhO
+FAhO-sa      <- ( !FAhO-mluvla SA-genvla )*
+                ( FAhO-mlupau FAhO-sa )*
+                SA-genpau
+             -> FAhO-sa
+
+;;
+;; LOhU
+;;
+LOhU-genpau  <- BAhE-genpau? LOhU-vimpau
+             -> LOhU-genpau
+LOhU-vimpau  <- ( LOhU-mlupau LOhU-sa &LOhU-mlupau )* LOhU-mlupau
+             -> LOhU-vimpau
+LOhU-mlupau  <- !BU-mluvla !ZEI-mluvla LOhU-mluvla
+; any |vimcu-genpau| will be attached to LEhU-vimpau
+LOhU-mluvla  <- LOhU LOhU-genvla* LEhU-vimpau
+             -> LOhU-mluvla
+; XXX: I do want to allow embedded LOhU..LEhU
+LOhU-genvla  <- !LEhU any-lojban-word
+LOhU-sa      <- ( !LOhU-mlupau SA-genvla )*
+                ( LOhU-mlupau LOhU-sa )*
+                SA-genpau
+             -> LOhU-sa
+
+
+;;
+;; LEhU
+;;
+; LEhU-genpau only appears on the left-hand side of SA.
+;
+LEhU-genpau  <- LEhU-vimpau
+LEhU-vimpau  <- ( LEhU-mlupau LEhU-sa &LEhU-mlupau )* LEhU-mlupau
+             -> LEhU-vimpau
+LEhU-mlupau  <- !BU-mluvla !ZEI-mluvla LEhU-mluvla
+LEhU-mluvla  <- LEhU vimcu-genpau?
+             -> LEhU-mluvla
+LEhU-sa      <- ( !LEhU-mlupau SA-genvla )*
+                ( LEhU-mlupau LEhU-sa )*
+                SA-genpau
+             -> LEhU-sa
+
+
+;;
+;; SA
+;;
+initial-sa  <- ( BAhE-sa SA-genpau* &BAhE-mlupau
+               / ( BU-sa / BY-sa )
+                 SA-genpau*
+                 &( BU-mlupau / BY-mlupau / bu-mlupau )
+               ; no FAhO-sa, as we don't look for other SA clauses
+               ; after we find a FAhO-sa.
+               / GISMU-sa SA-genpau* &GISMU-mlupau
+               / LEhU-sa SA-genpau* &LEhU-mlupau
+               / LOhU-sa SA-genpau* &LOhU-mlupau
+               ; XXX: hesitation is probably fine.
+               / SA-sa SA-genpau* !any-lojban-word
+               / SI-sa SA-genpau* &SI-mlupau
+               / SU-sa SA-genpau* &SU-mlupau
+               / ZEI-sa SA-genpau* &( ZEI-mlupau / zei-mlupau )
+               / ZO-sa SA-genpau* &( ZO-mlupau / &zo-mlupau )
+               / ZOI-sa SA-genpau* &ZOI-mlupau )
+               ; if we're immediately followed by a SI-genpau, that
+               ; is initial-si, not initial-sa
+               !SI-genpau
+            -> initial-sa
+                   ; it doesn't matter if FAhO is immediately
+                   ; followed by a SI-genpau, FAhO takes precedence
+                   ; and won't be erased by SI.
+initial-sa-FAhO <- FAhO-sa SA-genpau* &FAhO-mlupau
+                -> initial-sa-FAhO
+
+; No BAhE-genpau here, as this rule is only used inside the
+; individual selma'o SA handling, which handles BAhE.
+;
+; No SA handling here, as initial-sa handles the case of {sa sa}.
+;
+SA-genpau    <- SA-mlupau
+SA-mlupau    <- SA-mluvla
+SA-mluvla    <- SA
+             -> SA-mluvla
+SA-sa        <- SA-genvla* SA-genpau
+             -> SA-sa
+; XXX: should this include raw forms of magic words?  This might
+;      interact oddly with zo/zoi: "zoi sa" should probably be
+;      a grammar error.
+;
+SA-genvla    <- vimcu-genvla
+
+
+;;
+;; SI
+;;
+
+;
+; broda si sa broda si
+; broda si sa si broda
+; broda si sa si
+;
+; the first {broda si} is erased, so when the sa handling comes up,
+; 
+; for a {sa si} that follows, we would normally back up to the
+; previous si, but that has always been erased.
+;
+initial-si   <- ( SI-genpau
+                / ( bu-vimpau / zei-vimpau ) SI-genpau? SI
+                  -> initial-si-mluvla
+                / SI
+                  -> initial-si-SI )
+             -> initial-si
+SI-genpau    <- SI-mlupau
+             -> SI-genpau
+SI-mlupau    <- SI-mluvla
+SI-mluvla    <- SI-genvla SI-genpau? SI
+             -> SI-mluvla
+; A valid SA can immediately be followed by a SI, resulting in an
+; empty production.
+;
+; We can't match vimcu-genvla here, like we can for SA or SU, as
+; those words XXX
+;
+SI-genvla    <- BU-vimpau
+              / BY-vimpau
+              ;
+              ; FAhO takes precedence over any trailing SI,
+              ; Don't check for it.
+              ;
+              / GISMU-vimpau
+              / LOhU-vimpau
+              / LEhU-vimpau
+              ;
+              ; SA/SI/SU can only appear after SA in initial-sa,
+              ; which then becomes another initial-sa/si/su, which
+              ; then becomes an initial-si.  Don't check for
+              ; it.
+              ;
+              ; Y cannot be erased.
+              ;
+              / ZEI-vimpau
+              / zei-vimpau
+              / ZO-vimpau
+              / ZOI-vimpau
+              ; XXX: is this true?  does it belong at the top
+              ;      instead?
+              ; must always be at the end, as it is
+              ; contained in each of the above clauses.
+              / BAhE-vimpau
+
+
+; SI, because it is an erase word, does not follow the standard
+; pattern for SA handling.  {sa si} always backtracks to the
+; beginning of the text.
+;
+; this is only used in initial-sa, which skips over intermediate
+; si clauses, as they are erased before SA would begin backtracking,
+; meaning this clause always backtracks to the beginning of the
+; text.
+;
+SI-sa      <- ( !SI SA-genvla )*
+              SA-genpau
+           -> SI-sa
+
+
+;;
+;; SU
+;;
+initial-su <- SU-genpau
+           -> initial-su
+; NO BAhE-genpau, it is treated like any other SU word.
+; No SA handling, that is done in initial-sa
+;
+SU-genpau    <- SU-mlupau
+             -> SU-genpau
+SU-mlupau    <- SU-mluvla
+SU-mluvla    <- SU-genvla* SU vimcu-genpau?
+             -> SU-mluvla
+SU-genvla    <- vimcu-genvla
+SU-sa        <- ( !SU-mlupau SA-genvla )*
+                SA-genpau
+             -> SU-sa
+
+
+;;
+;; Y
+;;
+; XXX: these rules need testing.
+initial-y <- Y-genpau
+; XXX: should EOF be FAhO? !any-lojban-word?  Why is that here?
+Y-genpau  <- Y-mlupau &EOF
+Y-mlupau  <- !BU-mluvla !ZEI-mluvla Y-mluvla SI-genpau?
+          -> Y-mlupau
+Y-mluvla  <- Y
+          -> Y-mluvla
+
+
+;;
+;; ZEI
+;;
+; 
+; These are only used for SA processing, as they can only appear in
+; the grammar when they are erased by a SA.
+;
+; zei-genpau only appears on the left-hand side of SA.
+;
+zei-genpau   <- zei-vimpau
+zei-vimpau   <- ( ( ZEI-mlupau / zei-mlupau )
+                  ZEI-sa
+                  &( ZEI-mlupau / zei-mlupau ) )*
+                  zei-mlupau
+             -> zei-vimpau
+; XXX: are these exclusions needed?  Can I even match them?
+zei-mlupau   <- !BU-mluvla !ZEI-mluvla zei-mluvla
+zei-mluvla   <- ZEI vimcu-genpau?
+             -> zei-mluvla
+
+;
+; XXX:
+; I think {.abu broda sa brode bu} should erase ...
+; I'm trying to figure out whether to allow a SI inside of
+; a pseudo-word.  I'm pretty sure I don't want to do this,
+; but can I articulate why?
+;
+ZEI-genpau   <- BAhE-genpau? ZEI-vimpau
+             -> ZEI-genpau
+ZEI-vimpau   <- ( ( ZEI-mlupau / zei-mlupau )
+                  ZEI-sa
+                  &( ZEI-mlupau / zei-mlupau ) )*
+                ZEI-mlupau
+             -> ZEI-vimpau
+; XXX: do I need to mask BU-mluvla here?
+ZEI-mlupau   <- !BU-mluvla ZEI-mluvla
+ZEI-mluvla   <- ZEI-genvla ZEI-fanmo+
+             -> ZEI-mluvla
+; BU must be first in this list, as it is a left-binding magic
+; word.  The first part of a left-binding magic word may also
+; be matched by other-than magic words.
+ZEI-genvla   <- BU-mluvla
+              / paloroda-mluvla
+; XXX: We can't do some kinds of erasure (maybe all kinds) here:
+;ZEI-fanmo    <- BAhE-genpau? ZEI vimcu-genpau? ZEI-genvla
+;             -> ZEI-fanmo
+ZEI-fanmo    <- BAhE-genpau? ZEI ZEI-genvla
+             -> ZEI-fanmo
+ZEI-sa       <- ( !( ZEI-mlupau / zei-mlupau ) SA-genvla )*
+                ( ( ZEI-mlupau / zei-mlupau ) ZEI-sa )*
+                SA-genpau
+             -> ZEI-sa
+
+
+;;
+;; ZO
+;;
+zo-genpau    <- zo-vimpau
+zo-vimpau    <- ( ( ZO-mlupau / zo-mlupau )
+                  ZO-sa
+                  &( ZO-mlupau / zo-mlupau ) )*
+                  zo-mlupau
+             -> zo-vimpau
+; XXX: are these exclusions needed?  Can I even match them?
+zo-mlupau    <- !BU-mluvla !ZEI-mluvla zo-mluvla
+; XXX: what does !ZO-genvla match?  At least EOF
+; XXX: Y handling, just like ZO-genvla and ZEI-genvla
+zo-mluvla    <- ZO !ZO-genvla vimcu-genpau?
+             -> zo-mluvla
+
+ZO-genpau    <- BAhE-genpau? ZO-vimpau
+             -> ZO-genpau
+ZO-vimpau    <- ( ZO-mlupau ZO-sa &ZO-mlupau )* ZO-mlupau
+             -> ZO-vimpau
+ZO-mlupau    <- !BU-mluvla !ZEI-mluvla ZO-mluvla
+ZO-mluvla    <- ZO ZO-genvla vimcu-genpau?
+             -> ZO-mluvla
+; XXX: we match Y here, quoting it.  Should we check for
+;      it so it can be a hesitation noise?
+ZO-genvla    <- any-lojban-word
+ZO-sa        <- ( !(ZO-mlupau / zo-mlupau ) SA-genvla )*
+                ( ( ZO-mlupau / zo-mlupau ) ZO-sa )*
+                SA-genpau
+             -> ZO-sa
+
+
+;;
+;; ZOI
+;;
+ZOI-genpau   <- BAhE-genpau? ZOI-vimpau
+             -> ZOI-genpau
+ZOI-vimpau   <- ( ZOI-mlupau ZOI-sa &ZOI-mlupau )* ZOI-mlupau
+             -> ZOI-vimpau
+ZOI-mlupau   <- !BU-mluvla !ZEI-mluvla ZOI-mluvla
+ZOI-mluvla   <- ZOI ZOI-open ZOI-genvla* ZOI-close vimcu-genpau?
+             -> ZOI-mluvla
+; XXX: we match Y here, quoting it.  Should we check for
+;      it so it can be a hesitation noise?  Same case as ZO.
+ZOI-open     <- any-lojban-word -| zoi-open
+ZOI-genvla   <- any-lojban-word -| zoi-word
+ZOI-close    <- any-lojban-word -| zoi-close
+ZOI-sa       <- ( !ZOI-mlupau SA-genvla )*
+                ( ZOI-mlupau ZOI-sa )*
+                SA-genpau
+             -> ZOI-sa
