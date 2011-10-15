@@ -31,10 +31,6 @@
           ,@valsi*
           ,@(?-null FAhO-genpau?)))
 
-(define (vimcu-genvla genpau)
-  genpau)
-;  `(,genpau))
-
 (define (BAhE valsi)
   `(BAhE ,valsi))
 
@@ -84,8 +80,8 @@
 ;;
 ;; GISMU
 ;;
-(define (GISMU-genpau BAhE-genpau? GISMU-vimpau)
-  `(GISMU-genpau ,@(?-null BAhE-genpau?) ,@GISMU-vimpau))
+(define (GISMU-genpau BAhE-genpau* GISMU-vimpau)
+  `(GISMU-genpau ,@(?*-null BAhE-genpau*) ,@GISMU-vimpau))
 
 (define (GISMU-vimpau GISMU-sa* GISMU-mlupau)
   `(,@(map-apply sa* GISMU-sa*) ,GISMU-mlupau))
@@ -94,10 +90,7 @@
   `(GISMU-mluvla ,GISMU ,@(?*-null vimcu-genpau?)))
 
 (define (GISMU-sa SA-genvla* GISMU-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* GISMU-sa*) (,SA-genpau)))
-
-; XXX
-;  `(,@(apply append SA-genvla*) ,@(map-apply sa* GISMU-sa*) ,SA-genpau))
+  `(,@SA-genvla* ,@(map-apply sa* GISMU-sa*) ,SA-genpau))
   
 
 ;;
@@ -109,49 +102,52 @@
 (define (BAhE-vimpau BAhE-sa* BAhE-mlupau)
   `(,@(map-apply sa* BAhE-sa*) ,BAhE-mlupau))
 
-(define (BAhE-mluvla BAhE+)
-  (define (si BAhE vimcu-genpau?)
-    `(,@BAhE ,@(?*-null vimcu-genpau?)))
-  `(BAhE-mluvla ,@(map-apply si BAhE+)))
+(define (BAhE-mluvla BAhE vimcu-genpau?)
+  `(BAhE-mluvla ,BAhE ,@(?*-null vimcu-genpau?)))
 
 (define (BAhE-sa SA-genvla* BAhE-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* BAhE-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* BAhE-sa*) ,SA-genpau))
 
 
 ;;
 ;; BU
 ;;
+;XXX: permit ba'e before untagged bu?
+;(define (bu-genpau BAhE-genpau* bu-vimpau)
+;  `(BU-genpau ,@(?*-null BAhE-genpau*) ,@bu-vimpau))
+(define (bu-genpau bu-vimpau)
+  `(BU-genpau ,@bu-vimpau))
+
 (define (bu-vimpau bu-sa* BU-mlupau)
   `(,@(map-apply sa* bu-sa*) ,BU-mlupau))
-
 
 (define (bu-mluvla BU vimcu-genpau?)
   `(BU-mluvla ,BU ,@(?*-null vimcu-genpau?)))
 
 
-(define (BU-genpau BAhE-genpau? BU-vimpau)
-  `(BU-genpau ,@(?-null BAhE-genpau?) ,@BU-vimpau))
+(define (BU-genpau BAhE-genpau* BU-vimpau)
+  `(BU-genpau ,@(?*-null BAhE-genpau*) ,@BU-vimpau))
 
 (define (BU-vimpau BU-sa* BU-mlupau)
   `(,@(map-apply sa* BU-sa*) ,BU-mlupau))
 
 (define (BU-mluvla BU-genvla BU+)
-  (define (bu BAhE-genpau? BU vimcu-genpau?)
-    `(,@(?-null BAhE-genpau?)
+  (define (bu BAhE-genpau* BU vimcu-genpau?)
+    `(,@(?*-null BAhE-genpau*)
       ,BU
       ,@(?*-null vimcu-genpau?)))
 
   `(BU-mluvla ,BU-genvla ,@(apply append (map-apply bu BU+))))
 
 (define (BU-sa SA-genvla* BU-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* BU-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* BU-sa*) ,SA-genpau))
 
 
 ;;
 ;; BY
 ;;
-(define (BY-genpau BAhE-genpau? BY-vimpau)
-  `(BY-genpau ,@(?-null BAhE-genpau?) ,@BY-vimpau))
+(define (BY-genpau BAhE-genpau* BY-vimpau)
+  `(BY-genpau ,@(?*-null BAhE-genpau*) ,@BY-vimpau))
 
 (define (BY-vimpau BY-sa* BY-mlupau)
   `(,@(map-apply sa* BY-sa*) ,BY-mlupau))
@@ -160,27 +156,27 @@
   `(BY-mluvla ,BY ,@(?*-null vimcu-genpau?)))
 
 (define (BY-sa SA-genvla* BY-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* BY-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* BY-sa*) ,SA-genpau))
 
 
 ;;
 ;; FAhO
 ;;
-(define (FAhO-genpau BAhE-genpau? FAhO-mluvla)
-  `(FAhO-genpau ,@(?-null BAhE-genpau?) ,FAhO-mluvla))
+(define (FAhO-genpau BAhE-genpau* FAhO-mluvla)
+  `(FAhO-genpau ,@(?*-null BAhE-genpau*) ,FAhO-mluvla))
 
 (define (FAhO-mluvla FAhO)
   `(FAhO-mluvla ,FAhO))
 
 (define (FAhO-sa SA-genvla* FAhO-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* FAhO-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* FAhO-sa*) ,SA-genpau))
 
 
 ;;
 ;; LOhU
 ;;
-(define (LOhU-genpau BAhE-genpau? LOhU-vimpau)
-  `(LOhU-genpau ,@(?-null BAhE-genpau?) ,@LOhU-vimpau))
+(define (LOhU-genpau BAhE-genpau* LOhU-vimpau)
+  `(LOhU-genpau ,@(?*-null BAhE-genpau*) ,@LOhU-vimpau))
 
 (define (LOhU-vimpau LOhU-sa* LOhU-mlupau)
   `(,@(map-apply sa* LOhU-sa*) ,LOhU-mlupau))
@@ -189,12 +185,16 @@
   `(LOhU-mluvla ,LOhU ,@LOhU-genvla* ,@LEhU-vimpau))
 
 (define (LOhU-sa SA-genvla* LOhU-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* LOhU-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* LOhU-sa*) ,SA-genpau))
 
 
 ;;
 ;; LEhU
 ;;
+; XXX: permit ba'e?
+(define (LEhU-genpau LEhU-vimpau)
+  `(LEhU-genpau ,@LEhU-vimpau))
+
 (define (LEhU-vimpau LEhU-sa* LEhU-mlupau)
   `(,@(map-apply sa* LEhU-sa*) ,LEhU-mlupau))
 
@@ -202,25 +202,23 @@
   `(LEhU-mluvla ,LEhU ,@(?-null vimcu-genpau?)))
 
 (define (LEhU-sa SA-genvla* LEhU-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* LEhU-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* LEhU-sa*) ,SA-genpau))
 
 
 ;;
 ;; SA
 ;;
 (define (initial-sa VALSI-sa SA-genpau*)
-  `(SA-genpau ,@(apply append VALSI-sa) ,@SA-genpau*))
+  `(SA-genpau ,@VALSI-sa ,@SA-genpau*))
 
 (define (initial-sa-FAhO FAhO-sa SA-genpau*)
-  `(SA-genpau ,@(apply append FAhO-sa) ,@SA-genpau*))
+  `(SA-genpau ,@FAhO-sa ,@SA-genpau*))
 
 (define (SA-mluvla SA)
   `(SA-mluvla ,SA))
 
-; XXX: Why does SA-genvla* use ',@'?  Other procedures
-;      using this pattern don't.
 (define (SA-sa SA-genvla* SA-genpau)
-  `(,@SA-genvla* (,SA-genpau)))
+  `(,@SA-genvla* ,SA-genpau))
 
 
 ;;
@@ -242,12 +240,15 @@
 (define (SI-genpau SI-mlupau)
   SI-mlupau)
 
-(define (SI-mluvla SI-genvla SI-genpau? SI)
+(define (SI-mluvla SI-genvla SI-fanmo)
   ;XXX: ,SI-genvla: where does this come from?
-  `(SI-mluvla ,@SI-genvla ,@(?-null SI-genpau?) ,SI))
+  `(SI-mluvla ,@SI-genvla ,@SI-fanmo))
+
+(define (SI-fanmo SI-genpau? SI)
+  `(,@(?-null SI-genpau?) ,SI))
 
 (define (SI-sa SA-genvla* SA-genpau)
-  `(,SA-genvla* (,SA-genpau)))
+  `(,@SA-genvla* ,SA-genpau))
 
 
 ;;
@@ -260,10 +261,10 @@
   SU-mlupau)
 
 (define (SU-mluvla SU-genvla* SU vimcu-genpau?)
-  `(SU-mluvla ,@(apply append SU-genvla*) ,SU ,@(?*-null vimcu-genpau?)))
+  `(SU-mluvla ,@SU-genvla* ,SU ,@(?*-null vimcu-genpau?)))
 
 (define (SU-sa SA-genvla* SA-genpau)
-  `(,SA-genvla* (,SA-genpau)))
+  `(,@SA-genvla* ,SA-genpau))
 
 
 ;;
@@ -282,6 +283,10 @@
 ;;
 ;; ZEI
 ;;
+; XXX: permit ba'e?
+(define (zei-genpau zei-vimpau)
+  `(ZEI-genpau ,@zei-vimpau))
+
 (define (zei-vimpau zei-sa* ZEI-mlupau)
   `(,@(map-apply sa* zei-sa*) ,ZEI-mlupau))
 
@@ -289,8 +294,8 @@
   `(ZEI-mluvla ,ZEI ,@(?*-null vimcu-genpau?)))
 
 
-(define (ZEI-genpau BAhE-genpau? ZEI-vimpau)
-  `(ZEI-genpau ,@(?-null BAhE-genpau?) ,@ZEI-vimpau))
+(define (ZEI-genpau BAhE-genpau* ZEI-vimpau)
+  `(ZEI-genpau ,@(?*-null BAhE-genpau*) ,@ZEI-vimpau))
 
 (define (ZEI-vimpau ZEI-sa* ZEI-mlupau)
   `(,@(map-apply sa* ZEI-sa*) ,ZEI-mlupau))
@@ -299,13 +304,13 @@
   `(ZEI-mlulva ,ZEI-genvla ,@(apply append ZEI-fanmo+)))
 
 ;XXX
-;(define (ZEI-fanmo BAhE-genpau? ZEI vimcu-genpau? ZEI-genvla)
-;  `(,@(?-null BAhE-genpau?) ,ZEI ,@(?*-null vimcu-genpau?) ,ZEI-genvla))
-(define (ZEI-fanmo BAhE-genpau? ZEI ZEI-genvla)
-  `(,@(?-null BAhE-genpau?) ,ZEI ,ZEI-genvla))
+;(define (ZEI-fanmo BAhE-genpau* ZEI vimcu-genpau? ZEI-genvla)
+;  `(,@(?*-null BAhE-genpau*) ,ZEI ,@(?*-null vimcu-genpau?) ,ZEI-genvla))
+(define (ZEI-fanmo BAhE-genpau* ZEI ZEI-genvla)
+  `(,@(?*-null BAhE-genpau*) ,ZEI ,ZEI-genvla))
 
 (define (ZEI-sa SA-genvla* ZEI-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* ZEI-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* ZEI-sa*) ,SA-genpau))
 
 
 ;;
@@ -318,8 +323,8 @@
   `(ZO-mluvla ,ZO ,@(?*-null vimcu-genpau?)))
 
 
-(define (ZO-genpau BAhE-genpau? ZO-vimpau)
-  `(ZO-genpau ,@(?-null BAhE-genpau?) ,@ZO-vimpau))
+(define (ZO-genpau BAhE-genpau* ZO-vimpau)
+  `(ZO-genpau ,@(?*-null BAhE-genpau*) ,@ZO-vimpau))
 
 (define (ZO-vimpau ZO-sa* ZO-mlupau)
   `(,@(map-apply sa* ZO-sa*) ,ZO-mlupau))
@@ -328,14 +333,14 @@
   `(ZO-mluvla ,ZO ,ZO-genvla ,@(?*-null vimcu-genpau?)))
 
 (define (ZO-sa SA-genvla* ZO-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* ZO-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* ZO-sa*) ,SA-genpau))
 
 
 ;;
 ;; ZOI
 ;;
-(define (ZOI-genpau BAhE-genpau? ZOI-vimpau)
-  `(ZOI-genpau ,@(?-null BAhE-genpau?) ,@ZOI-vimpau))
+(define (ZOI-genpau BAhE-genpau* ZOI-vimpau)
+  `(ZOI-genpau ,@(?*-null BAhE-genpau*) ,@ZOI-vimpau))
 
 (define (ZOI-vimpau ZOI-sa* ZOI-mlupau)
   `(,@(map-apply sa* ZOI-sa*) ,ZOI-mlupau))
@@ -365,15 +370,14 @@
             #f)))))
 
 (define (ZOI-sa SA-genvla* ZOI-sa* SA-genpau)
-  `(,SA-genvla* ,(map-apply sa* ZOI-sa*) (,SA-genpau)))
+  `(,@SA-genvla* ,@(map-apply sa* ZOI-sa*) ,SA-genpau))
 
 
 ;;
 ;; tests
 ;;
 (secuxna-debug #t)
-;(secuxna-start-production "ZEI-mluvla")
-;(secuxna-start-production "BU-mluvla")
+;(secuxna-start-production "initial-sa-t")
 
 (let* ((makfa-cmene      "magic-words.peg")
        (makfa-samselpla  (call-with-input-file makfa-cmene genturfahi-peg))
@@ -414,12 +418,17 @@
     ; bu si
     ; broda bu si
     ; broda zei si
-
+;
     ;(exit)
+
 
   ; BAhE tests
   ;
   (define (test-BAhE)
+    (makfa-mapti
+      "ba'e"
+      '(gerna (BAhE-genpau (BAhE-mluvla (BAhE "ba'e")))))
+
     (makfa-mapti
       "ba'e broda"
       '(gerna (GISMU-genpau
@@ -435,6 +444,13 @@
       '(gerna (BAhE-genpau (BAhE-mluvla (BAhE "ba'e"))))
       "bu")
 
+
+		(makfa-mapti
+			"ba'e sa"
+			'(gerna (SA-genpau
+								(BAhE-genpau
+									(BAhE-mluvla (BAhE "ba'e")))
+								(SA-mluvla (SA "sa")))))
 
     (makfa-mapti
       "ba'e sa ba'e broda"
@@ -476,7 +492,10 @@
     ; bu + sa
     (makfa-mapti
       "bu sa"
-      '(gerna (SA-genpau (BU-mluvla (BU "bu")) (SA-mluvla (SA "sa")))))
+      '(gerna (SA-genpau
+								(BU-genpau
+									(BU-mluvla (BU "bu")))
+								(SA-mluvla (SA "sa")))))
 
     (makfa-narmapti "bu sa bu")
 
@@ -497,7 +516,11 @@
     ; bu + su
     (makfa-mapti
       "bu su" 
-      '(gerna (SU-genpau (SU-mluvla (BU-mluvla (BU "bu")) (SU "su")))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (BU-genpau
+                    (BU-mluvla (BU "bu")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda ba'e bu"
@@ -556,6 +579,14 @@
                 (LOhU-mluvla (LOhU "lo'u")
                 (ZEI "zei")
                 (LEhU-mluvla (LEhU "le'u"))))))
+
+		(makfa-mapti
+			"lo'u le'u sa"
+			'(gerna (SA-genpau
+								(LOhU-genpau
+									(LOhU-mluvla (LOhU "ba'e")
+															 (LEhU-mluvla (LEhU "le'u"))))
+								(SA-mluvla (SA "sa")))))
 
     (makfa-mapti
       "lo'u le'u zei"
@@ -833,20 +864,13 @@
     (makfa-mapti
       "broda sa sa sa brode"
       '(gerna (SA-genpau
-                (SA-genpau (GISMU-mluvla (gismu "broda "))
+                (SA-genpau (GISMU-mluvla (gismu "broda"))
                            (SA-mluvla (SA "sa")))
-              (SA-genpau (SA-mluvla (SA "sa")))
-              (SA-genpau (SA-mluvla (SA "sa"))))
+                (SA-mluvla (SA "sa"))
+                (SA-mluvla (SA "sa")))
               (GISMU-genpau (GISMU-mluvla (gismu "brode")))))
-			'(gerna (SA-genpau
-								(SA-genpau (GISMU-mluvla (gismu "broda"))
-													 (SA-mluvla (SA "sa")))
- 							  (SA-mluvla (SA "sa"))
-								(SA-mluvla (SA "sa")))
-								(GISMU-genpau (GISMU-mluvla (gismu "brode"))))
-								xxx
 
-		; XXX: duplicate
+    ; XXX: duplicate
     (makfa-narmapti "bu sa bu")
 
     ; initial sa, with some complex cases.
@@ -870,21 +894,20 @@
     (makfa-mapti
       "broda si broda sa si"
       '(gerna (SI-genpau
-                (SI-mluvla
-                  (GISMU-mluvla (gismu "broda"))
-                  (SI "si")))
-              (SA-genpau
-                (GISMU-genpau (GISMU-mluvla (gismu "broda")))
-                (SA-mluvla (SA "sa")))
-              (SI-genpau (SI-genpau (SI "si")))))
+                (SI-mluvla (GISMU-mluvla (gismu "broda")) (SI "si")))
+              (SA-genpau (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                         (SA-mluvla (SA "sa")))
+              (SI-genpau (SI-mluvla (SI "si")))))
 
     (makfa-mapti
       "broda broda si sa si"
-      '(gerna (SA-genpau (GISMU-genpau (gismu "broda")
-                                       (SI-genpau (GISMU-genpau (gismu "broda"))
-                                                  (SI "si")))
-                         (SA "sa"))
-              (SI-genpau (SI "si"))))
+      '(gerna (SA-genpau (GISMU-genpau
+                           (GISMU-mluvla (gismu "broda")
+                                         (SI-mluvla
+                                           (GISMU-mluvla (gismu "broda"))
+                                           (SI "si"))))
+                         (SA-mluvla (SA "sa")))
+              (SI-genpau (SI-mluvla (SI "si")))))
 
     (makfa-mapti
       "sa fa'o"
@@ -931,27 +954,14 @@
 
     (makfa-mapti
       "ba'e ba'e ba'e sa sa sa ba'e"
-      '(gerna))
-;      '(gerna (SA-genpau
-;                (SA-genpau
-;                  (BAhE-mluvla (BAhE "ba'e")
-;                               (BAhE "ba'e")
-;                               (BAhE "ba'e"))
-;                  (SA-mluvla (SA "sa")))
-;                (SA-mluvla (SA "sa"))
-;                (SA-mluvla (SA "sa")))
-;              (BAhE-genpau (BAhE-mluvla (BAhE "ba'e")))))
-
-;      '(gerna (BAhE-genpau
-;                (SA-genpau
-;                  (BAhE-mluvla (BAhE "ba'e"))
-;                  (SA-genpau
-;                    (BAhE-mluvla (BAhE "ba'e"))
-;                    (SA-genpau (BAhE-mluvla (BAhE "ba'e"))
-;                      (SA-mluvla (SA "sa")))
-;                    (SA-mluvla (SA "sa")))
-;                  (SA-mluvla (SA "sa")))
-;                (BAhE-mluvla (BAhE "ba'e")))))
+       '(gerna (BAhE-genpau
+                 (SA-genpau (BAhE-mluvla (BAhE "ba'e"))
+                   (SA-genpau (BAhE-mluvla (BAhE "ba'e"))
+                     (SA-genpau (BAhE-mluvla (BAhE "ba'e"))
+                       (SA-mluvla (SA "sa")))
+                     (SA-mluvla (SA "sa")))
+                   (SA-mluvla (SA "sa")))
+                 (BAhE-mluvla (BAhE "ba'e")))))
 
 
     ; SA + SI
@@ -961,67 +971,92 @@
     ;
     (makfa-mapti
       "sa si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (SI "si"))))
+      '(gerna (SA-genpau
+                (SA-mluvla (SA "sa")))
+              (SI-genpau (SI-mluvla (SI "si")))))
 
     (makfa-mapti
       "sa bu si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (BU "bu") (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SI-genpau (SI-mluvla (BU-mluvla (BU "bu")) (SI "si")))))
 
     (makfa-mapti
       "bu sa bu si"
-      '(gerna (SI-genpau (SA-genpau (BU "bu") (SA "sa"))
-                         (BU "bu") (SI "si"))))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (SA-genpau (BU-mluvla (BU "bu"))
+                             (SA-mluvla (SA "sa")))
+                  (BU-mluvla (BU "bu"))
+                  (SI "si")))))
 
     (makfa-mapti
       "sa broda bu si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (BU-genpau (gismu "broda") (BU "bu")) (SI "si"))))
+      '(gerna (SA-genpau
+                (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla
+                  (BU-mluvla (GISMU-mluvla (gismu "broda"))
+                             (BU "bu"))
+                  (SI "si")))))
 
     (makfa-mapti
       "sa lo'u le'u si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (LOhU-genpau (LOhU "lo'u") (LEhU "le'u"))
-                         (SI "si"))))
+      '(gerna (SA-genpau
+                (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla
+                  (LOhU-mluvla (LOhU "lo'u")
+                               (LEhU-mluvla (LEhU "le'u")))
+                  (SI "si")))))
 
     ; XXX: test each of these cases, they all call unique code.
 
     (makfa-mapti
       "sa le'u si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (LEhU "le'u")
-                         (SI "si"))))
+      '(gerna (SA-genpau
+                (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla (LEhU-mluvla (LEhU "le'u"))
+                           (SI "si")))))
 
 
     (makfa-mapti
       "sa si si"
-      '(gerna (SI-genpau (SA-genpau (SA "sa"))
-                         (SI "si"))
-              (SI-genpau (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SI-genpau (SI-mluvla (SI "si")))
+              (SI-genpau (SI-mluvla (SI "si")))))
 
     (makfa-mapti
       "sa su si"
-      '(gerna (SA-genpau (SA "sa"))
-              (SU-genpau (SU "su"))
-              (SI-genpau (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SU-genpau (SU-mluvla (SU "su")))
+              (SI-genpau (SI-mluvla (SI "si")))))
 
     (makfa-mapti
       "sa zei si"
-      '(gerna (SA-genpau (SA "sa")) (SI-genpau (ZEI "zei") (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla (ZEI-mluvla (ZEI "zei"))
+                           (SI "si")))))
 
     (makfa-mapti
       "sa broda zei brode si"
-      '(gerna (SA-genpau (SA "sa"))
-              (SI-genpau (ZEI-genpau (gismu "broda")
-                                     (ZEI "zei")
-                                     (gismu "brode"))
-                         (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (GISMU-mluvla (gismu "brode")))
+                  (SI "si")))))
 
     (makfa-mapti
       "sa zo si si"
-      '(gerna (SA-genpau (SA "sa"))
-              (SI-genpau (ZO-genpau (ZO "zo") (SI "si")) (SI "si"))))
+      '(gerna (SA-genpau
+                (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla
+                  (ZO-mluvla (ZO "zo") (SI "si"))
+                  (SI "si")))))
 
     (makfa-mapti
       "zo broda sa zo brode si"
@@ -1046,12 +1081,14 @@
 
     (makfa-mapti
       "sa zoi si si si"
-      '(gerna (SA-genpau (SA "sa"))
-              (SI-genpau (ZOI-genpau (ZOI "zoi")
-                                     (SI "si")
-                                     ()
-                                     (SI "si"))
-                         (SI "si"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SI-genpau
+                (SI-mluvla
+                  (ZOI-mluvla (ZOI "zoi")
+                              (SI "si")
+                              ()
+                              (SI "si"))
+                  (SI "si")))))
 
     ; XXX: more examples
     (makfa-mapti
@@ -1068,34 +1105,22 @@
 
     (makfa-mapti
       "sa su"
-      '(gerna (SA-genpau (SA "sa")) (SU-genpau (SU "su"))))
+      '(gerna (SA-genpau (SA-mluvla (SA "sa")))
+              (SU-genpau (SU-mluvla (SU "su")))))
 
-
-    (makfa-mapti
-      "broda zei brode sa brodi zei brodo"
-      '(gerna (ZEI-genpau (SA-genpau (ZEI-genpau (gismu "broda")
-                                                 (ZEI "zei")
-                                                 (gismu "brode"))
-                                     (SA "sa"))
-                          (gismu "brodi")
-                          (ZEI "zei")
-                          (gismu "brodo"))))
-
-    (makfa-mapti
-      "le'u sa le'u"
-      '(gerna (SA-genpau (LEhU-genpau (LEhU "le'u")) (SA "sa")))
-      "le'u")
-
+    (makfa-narmapti "le'u sa le'u")
 
     (makfa-mapti
       "broda zei brode sa brodi zei brodo"
-      '(gerna (ZEI-genpau (SA-genpau (ZEI-genpau (gismu "broda")
-                                                 (ZEI "zei")
-                                                 (gismu "brode"))
-                                     (SA "sa"))
-                          (gismu "brodi")
-                          (ZEI "zei")
-                          (gismu "brodo"))))
+      '(gerna (ZEI-genpau
+                (SA-genpau
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (GISMU-mluvla (gismu "brode")))
+                  (SA-mluvla (SA "sa")))
+                (ZEI-mlulva (GISMU-mluvla (gismu "brodi"))
+                            (ZEI "zei")
+                            (GISMU-mluvla (gismu "brodo"))))))
 
     (makfa-mapti
       "zo broda sa zo brode"
@@ -1103,42 +1128,53 @@
                                     (SA-mluvla (SA "sa")))
                          (ZO-mluvla (ZO "zo") (gismu "brode")))))
 
+    ; make sure that sa+bu is not fooled by other pseudo-words
+    ; between it and the previous bu.
     (makfa-mapti
       "broda bu zo broda broda broda si sa broda bu"
-      '(gerna (BU-genpau (SA-genpau (BU-genpau (gismu "broda") (BU "bu"))
-                                    (ZO-genpau (ZO "zo") (gismu "broda"))
-                                    (GISMU-genpau
-                                      (gismu "broda")
-                                      (SI-genpau (GISMU-genpau (gismu "broda"))
-                                                 (SI "si")))
-                                    (SA "sa"))
-                         (gismu "broda")
-                         (BU "bu"))))
+      '(gerna (BU-genpau
+                (SA-genpau (BU-mluvla (GISMU-mluvla (gismu "broda"))
+                                      (BU "bu"))
+                           (ZO-genpau (ZO-mluvla (ZO "zo")
+                                      (gismu "broda")))
+                           (GISMU-genpau
+                             (GISMU-mluvla
+                               (gismu "broda")
+                               (SI-mluvla (GISMU-mluvla (gismu "broda"))
+                                          (SI "si"))))
+                           (SA-mluvla (SA "sa")))
+                (BU-mluvla (GISMU-mluvla (gismu "broda")) (BU "bu")))))
 
     (makfa-mapti
       "zo broda broda bu broda broda si sa zo broda"
-      '(gerna (ZO-genpau (SA-genpau (ZO-genpau (ZO "zo") (gismu "broda"))
-                                    (BU-genpau (gismu "broda") (BU "bu"))
-                                    (GISMU-genpau
-                                      (gismu "broda")
-                                      (SI-genpau (GISMU-genpau (gismu "broda"))
-                                                 (SI "si")))
-                                    (SA "sa"))
-                         (ZO "zo")
-                         (gismu "broda"))))
+      '(gerna (ZO-genpau
+                (SA-genpau (ZO-mluvla (ZO "zo")
+                                      (gismu "broda"))
+                           (BU-genpau
+                             (BU-mluvla (GISMU-mluvla (gismu "broda"))
+                                        (BU "bu")))
+                           (GISMU-genpau
+                             (GISMU-mluvla
+                               (gismu "broda")
+                               (SI-mluvla (GISMU-mluvla (gismu "broda"))
+                                          (SI "si"))))
+                           (SA-mluvla (SA "sa")))
+                (ZO-mluvla (ZO "zo") (gismu "broda")))))
 
     (makfa-mapti
       "broda zo broda broda bu broda si sa broda"
-      '(gerna (GISMU-genpau (SA-genpau (GISMU-genpau (gismu "broda"))
-                                       (ZO-genpau (ZO "zo") (gismu "broda"))
-                                       (BU-genpau
-                                         (gismu "broda")
-                                         (BU "bu")
-                                         (SI-genpau
-                                           (GISMU-genpau (gismu "broda"))
-                                           (SI "si")))
-                                       (SA "sa"))
-                            (gismu "broda")))))
+      '(gerna (GISMU-genpau
+                (SA-genpau (GISMU-mluvla (gismu "broda"))
+                           (ZO-genpau (ZO-mluvla (ZO "zo")
+                                                 (gismu "broda")))
+                           (BU-genpau
+                             (BU-mluvla
+                               (GISMU-mluvla (gismu "broda"))
+                               (BU "bu")
+                               (SI-mluvla (GISMU-mluvla (gismu "broda"))
+                                          (SI "si"))))
+                           (SA-mluvla (SA "sa")))
+                (GISMU-mluvla (gismu "broda"))))))
 
 
   ;; si tests
@@ -1398,7 +1434,13 @@
 
     (makfa-mapti
       "broda zei brode si brodi"
-      '(gerna))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (GISMU-mluvla (gismu "brode")))
+                  (SI "si")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brodi")))))
 
     (makfa-mapti
       "broda zei brode brodi si"
@@ -1422,7 +1464,13 @@
 
     (makfa-mapti
       "broda zei le'u si brode"
-      '(gerna))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (LEhU-mluvla (LEhU "le'u")))
+                  (SI "si")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brode")))))
 
     (makfa-mapti
       "broda zei brode le'u si"
@@ -1448,7 +1496,14 @@
 
     (makfa-mapti
       "broda zei brode bu si brodi"
-      '(gerna))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (BU-mluvla (GISMU-mluvla (gismu "brode"))
+                                         (BU "bu")))
+                  (SI "si")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brodi")))))
 
     (makfa-mapti
       "broda zei brode brodi bu si"
@@ -1475,7 +1530,13 @@
 
     (makfa-mapti
       "broda zei zo brode si brodi"
-      '(gerna))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                              (ZEI "zei")
+                              (ZO-mluvla (ZO "zo") (gismu "brode")))
+                  (SI "si")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brodi")))))
 
     (makfa-mapti
       "broda zei brode zo brodi si"
@@ -1536,71 +1597,104 @@
     ;
     (makfa-mapti
       "su"
-      '(gerna (SU-genpau (SU "su"))))
+      '(gerna (SU-genpau (SU-mluvla (SU "su")))))
     (makfa-mapti
       "su su"
-      '(gerna (SU-genpau (SU "su"))
-              (SU-genpau (SU "su"))))
+      '(gerna (SU-genpau (SU-mluvla (SU "su")))
+              (SU-genpau (SU-mluvla (SU "su")))))
     (makfa-mapti
       "su su su"
-      '(gerna (SU-genpau (SU "su"))
-              (SU-genpau (SU "su"))
-              (SU-genpau (SU "su"))))
+      '(gerna (SU-genpau (SU-mluvla (SU "su")))
+              (SU-genpau (SU-mluvla (SU "su")))
+              (SU-genpau (SU-mluvla (SU "su")))))
 
     (makfa-mapti
       "bu su"
-      '(gerna (SU-genpau (BU "bu") (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (BU-genpau
+                    (BU-mluvla (BU "bu")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda bu su"
-      '(gerna (SU-genpau (BU-genpau (gismu "broda") (BU "bu")) (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (BU-genpau
+                    (BU-mluvla (GISMU-mluvla (gismu "broda"))
+                               (BU "bu")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda su"
-      '(gerna (SU-genpau (GISMU-genpau (gismu "broda")) (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                  (SU "su")))))
 
     (makfa-mapti
       "le'u su"
-      '(gerna (SU-genpau (LEhU "le'u") (SU "su"))))
+      '(gerna (SU-genpau
+								(SU-mluvla
+									(LEhU-genpau
+									  (LEhU-mluvla (LEhU "le'u")))
+									(SU "su")))))
 
     (makfa-mapti
       "si su"
-      '(gerna (SI-genpau (SI "si"))
-              (SU-genpau (SU "su"))))
+      '(gerna (SI-genpau (SI-mluvla (SI "si")))
+              (SU-genpau (SU-mluvla (SU "su")))))
 
     (makfa-mapti
       "broda si su"
-      '(gerna (SI-genpau (GISMU-genpau (gismu "broda")) (SI "si"))
-              (SU-genpau (SU "su"))))
+			'(gerna (SI-genpau
+								(SI-mluvla
+									(GISMU-mluvla (gismu "broda"))
+									(SI "si")))
+							(SU-genpau (SU-mluvla (SU "su")))))
 
     (makfa-mapti
       "zei su"
-      '(gerna (SU-genpau (ZEI "zei") (SU "su"))))
+			'(gerna (SU-genpau
+			          (SU-mluvla
+									(ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+									(SU "su")))))
 
     (makfa-mapti
       "broda zei su"
-      '(gerna (SU-genpau (GISMU-genpau (gismu "broda"))
-                         (ZEI "zei")
-                         (SU "su"))))
+			'(gerna (SU-genpau
+								(SU-mluvla
+									(GISMU-genpau (GISMU-mluvla (gismu "broda")))
+									(ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+									(SU "su")))))
 
     (makfa-mapti
       "broda zei brode su"
-      '(gerna (SU-genpau (ZEI-genpau (gismu "broda")
-                                     (ZEI "zei")
-                                     (gismu "brode"))
-                         (SU "su"))))
+			'(gerna (SU-genpau
+								(SU-mluvla
+									(ZEI-genpau
+										(ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+																(ZEI "zei")
+																(GISMU-mluvla (gismu "brode"))))
+									(SU "su")))))
 
     ; zo wins zo su, find that test in zo.
 
     (makfa-mapti
       "zo su su"
-      '(gerna (SU-genpau (ZO-genpau (ZO "zo") (SU "su"))
-                         (SU "su"))))
+			'(gerna (SU-genpau
+								(SU-mluvla
+									(ZO-genpau (ZO-mluvla (ZO "zo") (SU "su")))
+									(SU"su")))))
 
     (makfa-mapti
       "zo broda su"
-      '(gerna (SU-genpau (ZO-genpau (ZO "zo") (gismu "broda"))
-                         (SU "su")))))
+			'(gerna (SU-genpau
+								(SU-mluvla
+									(ZO-genpau
+										(ZO-mluvla (ZO "zo")
+															 (gismu "broda")))
+								  (SU "su"))))))
 
 
   ;; y tests
@@ -1994,8 +2088,8 @@
   (test-LOhU)
   (test-SA)
   (test-SI)
-  (exit)
   (test-SU)
+  (exit)
   (test-ZEI)
   (test-Y)
   (test-ZO)

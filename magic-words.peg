@@ -453,7 +453,7 @@ EOF   <- !.
 ;;
 ;; => broda broda
 ;;
-GISMU-genpau <- BAhE-genpau? GISMU-vimpau
+GISMU-genpau <- BAhE-genpau* GISMU-vimpau
              -> GISMU-genpau
 GISMU-vimpau <- ( GISMU-mlupau GISMU-sa &GISMU-mlupau )* GISMU-mlupau
              -> GISMU-vimpau
@@ -548,13 +548,13 @@ paloroda-mluvla <- BY-mluvla
 ; no left hand side matching, SI does not use this rule.
 ;
 vimcu-genvla <- valsi-genpau
-              / bu-genpau   -> vimcu-genvla
-              / LEhU-genpau -> vimcu-genvla
+              / bu-genpau
+              / LEhU-genpau
               ; XXX: I'm not sure if this can ever be matched, as
               ; I'm not sure there is anything at all forbidden to
               ; the right of {zo}.
-              / zo-genpau   -> vimcu-genvla
-              / zei-genpau  -> vimcu-genvla
+              / zo-genpau
+              / zei-genpau
 
 vimcu-genpau <- ( SI-genpau / Y-genpau )+
 
@@ -574,8 +574,8 @@ BAhE-vimpau  <- ( BAhE-mlupau BAhE-sa &BAhE-mlupau )* BAhE-mlupau
 ;      other words in them.  How do I determine that BAhE is
 ;      all by itself and not part of a larger clause?
 ;
-BAhE-mlupau  <- !BU-mluvla !ZEI-mluvla BAhE-mluvla
-BAhE-mluvla  <- ( BAhE vimcu-genpau? )+
+BAhE-mlupau  <- BAhE-mluvla
+BAhE-mluvla  <- BAhE vimcu-genpau?
              -> BAhE-mluvla
 BAhE-sa      <- ( !BAhE-mlupau SA-genvla )*
                 ( BAhE-mlupau BAhE-sa )*
@@ -585,6 +585,7 @@ BAhE-sa      <- ( !BAhE-mlupau SA-genvla )*
 ; bu-genpau only appears on the left-hand side of SA.
 ;
 bu-genpau    <- bu-vimpau
+             -> bu-genpau
 bu-vimpau    <- ( ( BU-mlupau / BY-mlupau / bu-mlupau )
                   BU-sa
                   &( BU-mlupau / BY-mlupau / bu-mlupau ) )*
@@ -604,7 +605,7 @@ bu-mluvla    <- BU vimcu-genpau?
 ; bu} was the ba'e letteral, we would also have to forbid {ba'e}
 ; before second and subsequent {bu} in a BU-genpau.
 ;
-BU-genpau    <- BAhE-genpau? BU-vimpau
+BU-genpau    <- BAhE-genpau* BU-vimpau
              -> BU-genpau
 BU-vimpau    <- ( ( BU-mlupau / BY-mluvla / bu-mluvla )
                   BU-sa
@@ -612,7 +613,7 @@ BU-vimpau    <- ( ( BU-mlupau / BY-mluvla / bu-mluvla )
                 BU-mlupau
              -> BU-vimpau
 BU-mlupau    <- !ZEI-mluvla BU-mluvla
-BU-mluvla    <- BU-genvla ( BAhE-genpau? BU vimcu-genpau? )+
+BU-mluvla    <- BU-genvla ( BAhE-genpau* BU vimcu-genpau? )+
              -> BU-mluvla
               ; a ZEI letteral is not permitted, ZEI takes precedence.
 BU-genvla    <- paloroda-mluvla
@@ -625,7 +626,7 @@ BU-sa        <- ( !( BU-mlupau / BY-mlupau / bu-mlupau ) SA-genvla )*
 ;;
 ;; BY
 ;;
-BY-genpau    <- BAhE-genpau? BY-vimpau
+BY-genpau    <- BAhE-genpau* BY-vimpau
              -> BY-genpau
 BY-vimpau    <- ( ( BU-mlupau / BY-mlupau / bu-mlupau )
                   BY-sa
@@ -648,7 +649,7 @@ BY-sa        <- ( !( BU-mlupau / BY-mlupau / bu-mlupau ) SA-genvla )*
 ; the initial-sa case for FAhO is an exception.  It is permitted,
 ; but additional initial-* clauses are not permitted.
 ;
-FAhO-genpau  <- BAhE-genpau? FAhO-mluvla
+FAhO-genpau  <- BAhE-genpau* FAhO-mluvla
              -> FAhO-genpau
 ; there is no FAhO-vimpau as the precedence of FAhO is higher than any
 ; erase words.  FAhO can't be erased.
@@ -665,7 +666,7 @@ FAhO-sa      <- ( !FAhO-mluvla SA-genvla )*
 ;;
 ;; LOhU
 ;;
-LOhU-genpau  <- BAhE-genpau? LOhU-vimpau
+LOhU-genpau  <- BAhE-genpau* LOhU-vimpau
              -> LOhU-genpau
 LOhU-vimpau  <- ( LOhU-mlupau LOhU-sa &LOhU-mlupau )* LOhU-mlupau
              -> LOhU-vimpau
@@ -687,6 +688,7 @@ LOhU-sa      <- ( !LOhU-mlupau SA-genvla )*
 ; LEhU-genpau only appears on the left-hand side of SA.
 ;
 LEhU-genpau  <- LEhU-vimpau
+             -> LEhU-genpau
 LEhU-vimpau  <- ( LEhU-mlupau LEhU-sa &LEhU-mlupau )* LEhU-mlupau
              -> LEhU-vimpau
 LEhU-mlupau  <- !BU-mluvla !ZEI-mluvla LEhU-mluvla
@@ -701,28 +703,29 @@ LEhU-sa      <- ( !LEhU-mlupau SA-genvla )*
 ;;
 ;; SA
 ;;
-initial-sa  <- ( BAhE-sa SA-genpau* &BAhE-mlupau
-               / ( BU-sa / BY-sa )
-                 SA-genpau*
-                 &( BU-mlupau / BY-mlupau / bu-mlupau )
-               ; no FAhO-sa, as we don't look for other SA clauses
-               ; after we find a FAhO-sa.
-               / GISMU-sa SA-genpau* &GISMU-mlupau
-               / LEhU-sa SA-genpau* &LEhU-mlupau
-               / LOhU-sa SA-genpau* &LOhU-mlupau
-               ; XXX: hesitation is probably fine.
-               / SA-sa SA-genpau* !any-lojban-word
-               / SI-sa SA-genpau* &SI-mlupau
-               / SU-sa SA-genpau* &SU-mlupau
-               / ZEI-sa SA-genpau* &( ZEI-mlupau / zei-mlupau )
-               / ZO-sa SA-genpau* &( ZO-mlupau / &zo-mlupau )
-               / ZOI-sa SA-genpau* &ZOI-mlupau )
-               ; if we're immediately followed by a SI-genpau, that
-               ; is initial-si, not initial-sa
-               !SI-genpau
+initial-sa  <- ( ( ( BAhE-sa SA-genpau* &BAhE-mlupau
+                   / ( BU-sa / BY-sa )
+                     SA-genpau*
+                     &( BU-mlupau / BY-mlupau / bu-mlupau )
+                   ; no FAhO-sa, as we don't look for other SA clauses
+                   ; after we find a FAhO-sa.
+                   / GISMU-sa SA-genpau* &GISMU-mlupau
+                   / LEhU-sa SA-genpau* &LEhU-mlupau
+                   / LOhU-sa SA-genpau* &LOhU-mlupau
+                   ; XXX: hesitation is probably fine.
+                   / SA-sa SA-genpau* !any-lojban-word
+							     ; XXX: bare SU, rather than SU-mlupau?
+                   / SU-sa SA-genpau* &SU-mlupau
+                   / ZEI-sa SA-genpau* &( ZEI-mlupau / zei-mlupau )
+                   / ZO-sa SA-genpau* &( ZO-mlupau / &zo-mlupau )
+                   / ZOI-sa SA-genpau* &ZOI-mlupau )
+                   ; if we're immediately followed by a SI, that
+                   ; is initial-si, not initial-sa
+                   !SI-fanmo )
+                 / SI-sa SA-genpau* &SI-fanmo )
             -> initial-sa
                    ; it doesn't matter if FAhO is immediately
-                   ; followed by a SI-genpau, FAhO takes precedence
+                   ; followed by a SI-fanmo, FAhO takes precedence
                    ; and won't be erased by SI.
 initial-sa-FAhO <- FAhO-sa SA-genpau* &FAhO-mlupau
                 -> initial-sa-FAhO
@@ -768,8 +771,11 @@ initial-si   <- ( SI-genpau
 SI-genpau    <- SI-mlupau
              -> SI-genpau
 SI-mlupau    <- SI-mluvla
-SI-mluvla    <- SI-genvla SI-genpau? SI
+SI-mluvla    <- SI-genvla SI-fanmo
              -> SI-mluvla
+; used within and-predicate, not-predicate.
+SI-fanmo     <- SI-genpau? SI
+             -> SI-fanmo
 ; A valid SA can immediately be followed by a SI, resulting in an
 ; empty production.
 ;
@@ -813,7 +819,7 @@ SI-genvla    <- BU-vimpau
 ; meaning this clause always backtracks to the beginning of the
 ; text.
 ;
-SI-sa      <- ( !SI SA-genvla )*
+SI-sa      <- ( !SI-fanmo SA-genvla )*
               SA-genpau
            -> SI-sa
 
@@ -860,6 +866,7 @@ Y-mluvla  <- Y
 ; zei-genpau only appears on the left-hand side of SA.
 ;
 zei-genpau   <- zei-vimpau
+             -> zei-genpau
 zei-vimpau   <- ( ( ZEI-mlupau / zei-mlupau )
                   ZEI-sa
                   &( ZEI-mlupau / zei-mlupau ) )*
@@ -877,7 +884,7 @@ zei-mluvla   <- ZEI vimcu-genpau?
 ; a pseudo-word.  I'm pretty sure I don't want to do this,
 ; but can I articulate why?
 ;
-ZEI-genpau   <- BAhE-genpau? ZEI-vimpau
+ZEI-genpau   <- BAhE-genpau* ZEI-vimpau
              -> ZEI-genpau
 ZEI-vimpau   <- ( ( ZEI-mlupau / zei-mlupau )
                   ZEI-sa
@@ -894,9 +901,9 @@ ZEI-mluvla   <- ZEI-genvla ZEI-fanmo+
 ZEI-genvla   <- BU-mluvla
               / paloroda-mluvla
 ; XXX: We can't do some kinds of erasure (maybe all kinds) here:
-;ZEI-fanmo    <- BAhE-genpau? ZEI vimcu-genpau? ZEI-genvla
+;ZEI-fanmo    <- BAhE-genpau* ZEI vimcu-genpau? ZEI-genvla
 ;             -> ZEI-fanmo
-ZEI-fanmo    <- BAhE-genpau? ZEI ZEI-genvla
+ZEI-fanmo    <- BAhE-genpau* ZEI ZEI-genvla
              -> ZEI-fanmo
 ZEI-sa       <- ( !( ZEI-mlupau / zei-mlupau ) SA-genvla )*
                 ( ( ZEI-mlupau / zei-mlupau ) ZEI-sa )*
@@ -920,7 +927,7 @@ zo-mlupau    <- !BU-mluvla !ZEI-mluvla zo-mluvla
 zo-mluvla    <- ZO !ZO-genvla vimcu-genpau?
              -> zo-mluvla
 
-ZO-genpau    <- BAhE-genpau? ZO-vimpau
+ZO-genpau    <- BAhE-genpau* ZO-vimpau
              -> ZO-genpau
 ZO-vimpau    <- ( ZO-mlupau ZO-sa &ZO-mlupau )* ZO-mlupau
              -> ZO-vimpau
@@ -939,7 +946,7 @@ ZO-sa        <- ( !(ZO-mlupau / zo-mlupau ) SA-genvla )*
 ;;
 ;; ZOI
 ;;
-ZOI-genpau   <- BAhE-genpau? ZOI-vimpau
+ZOI-genpau   <- BAhE-genpau* ZOI-vimpau
              -> ZOI-genpau
 ZOI-vimpau   <- ( ZOI-mlupau ZOI-sa &ZOI-mlupau )* ZOI-mlupau
              -> ZOI-vimpau
