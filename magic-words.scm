@@ -445,12 +445,12 @@
       "bu")
 
 
-		(makfa-mapti
-			"ba'e sa"
-			'(gerna (SA-genpau
-								(BAhE-genpau
-									(BAhE-mluvla (BAhE "ba'e")))
-								(SA-mluvla (SA "sa")))))
+    (makfa-mapti
+      "ba'e sa"
+      '(gerna (SA-genpau
+                (BAhE-genpau
+                  (BAhE-mluvla (BAhE "ba'e")))
+                (SA-mluvla (SA "sa")))))
 
     (makfa-mapti
       "ba'e sa ba'e broda"
@@ -493,9 +493,9 @@
     (makfa-mapti
       "bu sa"
       '(gerna (SA-genpau
-								(BU-genpau
-									(BU-mluvla (BU "bu")))
-								(SA-mluvla (SA "sa")))))
+                (BU-genpau
+                  (BU-mluvla (BU "bu")))
+                (SA-mluvla (SA "sa")))))
 
     (makfa-narmapti "bu sa bu")
 
@@ -580,13 +580,13 @@
                 (ZEI "zei")
                 (LEhU-mluvla (LEhU "le'u"))))))
 
-		(makfa-mapti
-			"lo'u le'u sa"
-			'(gerna (SA-genpau
-								(LOhU-genpau
-									(LOhU-mluvla (LOhU "ba'e")
-															 (LEhU-mluvla (LEhU "le'u"))))
-								(SA-mluvla (SA "sa")))))
+    (makfa-mapti
+      "lo'u le'u sa"
+      '(gerna (SA-genpau
+                (LOhU-genpau
+                  (LOhU-mluvla (LOhU "ba'e")
+                               (LEhU-mluvla (LEhU "le'u"))))
+                (SA-mluvla (SA "sa")))))
 
     (makfa-mapti
       "lo'u le'u zei"
@@ -1635,10 +1635,10 @@
     (makfa-mapti
       "le'u su"
       '(gerna (SU-genpau
-								(SU-mluvla
-									(LEhU-genpau
-									  (LEhU-mluvla (LEhU "le'u")))
-									(SU "su")))))
+                (SU-mluvla
+                  (LEhU-genpau
+                    (LEhU-mluvla (LEhU "le'u")))
+                  (SU "su")))))
 
     (makfa-mapti
       "si su"
@@ -1647,54 +1647,54 @@
 
     (makfa-mapti
       "broda si su"
-			'(gerna (SI-genpau
-								(SI-mluvla
-									(GISMU-mluvla (gismu "broda"))
-									(SI "si")))
-							(SU-genpau (SU-mluvla (SU "su")))))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (GISMU-mluvla (gismu "broda"))
+                  (SI "si")))
+              (SU-genpau (SU-mluvla (SU "su")))))
 
     (makfa-mapti
       "zei su"
-			'(gerna (SU-genpau
-			          (SU-mluvla
-									(ZEI-genpau (ZEI-mluvla (ZEI "zei")))
-									(SU "su")))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda zei su"
-			'(gerna (SU-genpau
-								(SU-mluvla
-									(GISMU-genpau (GISMU-mluvla (gismu "broda")))
-									(ZEI-genpau (ZEI-mluvla (ZEI "zei")))
-									(SU "su")))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda zei brode su"
-			'(gerna (SU-genpau
-								(SU-mluvla
-									(ZEI-genpau
-										(ZEI-mlulva (GISMU-mluvla (gismu "broda"))
-																(ZEI "zei")
-																(GISMU-mluvla (gismu "brode"))))
-									(SU "su")))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau
+                    (ZEI-mlulva (GISMU-mluvla (gismu "broda"))
+                                (ZEI "zei")
+                                (GISMU-mluvla (gismu "brode"))))
+                  (SU "su")))))
 
     ; zo wins zo su, find that test in zo.
 
     (makfa-mapti
       "zo su su"
-			'(gerna (SU-genpau
-								(SU-mluvla
-									(ZO-genpau (ZO-mluvla (ZO "zo") (SU "su")))
-									(SU"su")))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZO-genpau (ZO-mluvla (ZO "zo") (SU "su")))
+                  (SU"su")))))
 
     (makfa-mapti
       "zo broda su"
-			'(gerna (SU-genpau
-								(SU-mluvla
-									(ZO-genpau
-										(ZO-mluvla (ZO "zo")
-															 (gismu "broda")))
-								  (SU "su"))))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZO-genpau
+                    (ZO-mluvla (ZO "zo")
+                               (gismu "broda")))
+                  (SU "su"))))))
 
 
   ;; y tests
