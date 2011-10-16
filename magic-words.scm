@@ -74,7 +74,7 @@
   `(ZOI ,valsi))
 
 (define (sa* mlupau sa)
-  `(SA-genpau ,mlupau ,@(apply append sa)))
+  `(SA-genpau ,mlupau ,@sa))
 
 
 ;;
@@ -419,8 +419,6 @@
     ; broda bu si
     ; broda zei si
 ;
-    ;(exit)
-
 
   ; BAhE tests
   ;
@@ -584,7 +582,7 @@
       "lo'u le'u sa"
       '(gerna (SA-genpau
                 (LOhU-genpau
-                  (LOhU-mluvla (LOhU "ba'e")
+                  (LOhU-mluvla (LOhU "lo'u")
                                (LEhU-mluvla (LEhU "le'u"))))
                 (SA-mluvla (SA "sa")))))
 
@@ -1765,7 +1763,7 @@
 
     (makfa-mapti
       "broda zei"
-      '(gerna (GISMU-genpau (gismu "broda")))
+      '(gerna (GISMU-genpau (GISMU-mluvla (gismu "broda"))))
       "zei")
 
     (makfa-mapti
@@ -1775,29 +1773,37 @@
 
     (makfa-mapti
       "broda zei brode"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (gismu "brode"))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brode"))))))
 
     (makfa-mapti
       "broda zei brode zei brodi"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (gismu "brode")
-                          (ZEI "zei")
-                          (gismu "brodi"))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brode"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brodi"))))))
 
     (makfa-mapti
       "broda bu zei brode"
-      '(gerna (ZEI-genpau (BU-genpau (gismu "broda") (BU "bu"))
-                          (ZEI "zei")
-                          (gismu "brode"))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (BU-mluvla (GISMU-mluvla (gismu "broda")) (BU "bu"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brode"))))))
 
     (makfa-mapti
       "broda zei brode bu"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (BU-genpau (gismu "brode") (BU "bu")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (BU-mluvla (GISMU-mluvla (gismu "brode")) (BU "bu"))))))
 
     (makfa-mapti
       "broda bu zei brode bu"
@@ -1809,26 +1815,30 @@
     ;
     (makfa-mapti
       "broda zei fa'o"
-      '(gerna (GISMU-genpau (gismu "broda")))
+      '(gerna (GISMU-genpau (GISMU-mluvla (gismu "broda"))))
       "zei fa'o")
 
 
     ; lo'u ... le'u
     (makfa-mapti
       "lo'u broda le'u zei brode"
-      '(gerna (ZEI-genpau (LOhU-genpau (LOhU "lo'u")
-                                       (gismu "broda")
-                                       (LEhU "le'u"))
-                          (ZEI "zei")
-                          (gismu "brode"))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (LOhU-mluvla (LOhU "lo'u")
+                               (gismu "broda")
+                               (LEhU-mluvla (LEhU "le'u")))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brode"))))))
 
     (makfa-mapti
       "broda zei lo'u brode le'u"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (LOhU-genpau (LOhU "lo'u")
-                                       (gismu "brode")
-                                       (LEhU "le'u")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (LOhU-mluvla (LOhU "lo'u")
+                               (gismu "brode")
+                               (LEhU-mluvla (LEhU "le'u")))))))
 
     (makfa-mapti
       "lo'u broda le'u zei lo'u brode le'u"
@@ -1858,10 +1868,13 @@
 
     (makfa-mapti
       "broda zei brode si"
-      '(gerna (SI-genpau (ZEI-genpau (gismu "broda")
-                                     (ZEI "zei")
-                                     (gismu "brode"))
-                         (SI "si"))))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mlulva
+                    (GISMU-mluvla (gismu "broda"))
+                    (ZEI "zei")
+                    (GISMU-mluvla (gismu "brode")))
+                  (SI "si")))))
 
     (makfa-mapti
       "zei sa zei"
@@ -1884,87 +1897,104 @@
 
     (makfa-mapti
       "zei su"
-      '(gerna (SU-genpau (ZEI "zei") (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "zei zei su"
-      '(gerna (SU-genpau (ZEI "zei") (ZEI "zei") (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "zei zei zei su"
-      '(gerna (SU-genpau (ZEI "zei") (ZEI "zei") (ZEI "zei") (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda zei su"
-      '(gerna (SU-genpau (GISMU-genpau (GISMU-mluvla (gismu "broda")))
-                         (ZEI "zei")
-                         (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                  (ZEI-genpau   (ZEI-mluvla   (ZEI   "zei")))
+                  (SU "su")))))
 
     (makfa-mapti
       "zei brode su"
-      '(gerna (SU-genpau (ZEI "zei")
-                         (GISMU-genpau (GISMU-mluvla (gismu "brode")))
-                         (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau   (ZEI-mluvla   (ZEI   "zei")))
+                  (GISMU-genpau (GISMU-mluvla (gismu "brode")))
+                  (SU "su")))))
 
     (makfa-mapti
       "broda zei brode su"
-      '(gerna (SU-genpau (ZEI-genpau (gismu "broda")
-                                     (ZEI "zei")
-                                     (gismu "brode"))
-                         (SU "su"))))
+      '(gerna (SU-genpau
+                (SU-mluvla
+                  (ZEI-genpau
+                    (ZEI-mlulva
+                      (GISMU-mluvla (gismu "broda"))
+                      (ZEI "zei")
+                      (GISMU-mluvla (gismu "brode"))))
+                  (SU "su")))))
 
     (makfa-mapti
       "zo zei broda"
-      '(gerna (ZO-genpau (ZO "zo") (ZEI "zei"))
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (ZEI "zei")))
               (GISMU-genpau (GISMU-mluvla (gismu "broda")))))
 
     (makfa-mapti
       "zo broda zei brode"
-      '(gerna (ZEI-genpau (ZO-genpau (ZO "zo") (gismu "broda"))
-                          (ZEI "zei")
-                          (gismu "brode"))))
+      '(gerna (ZEI-genpau (ZEI-mlulva (ZO-mluvla (ZO "zo") 
+      (gismu "broda")) (ZEI "zei") (GISMU-mluvla (gismu "brode"))))))
 
     (makfa-mapti
       "broda zei zo brode"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (ZO-genpau (ZO "zo") (gismu "brode")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (ZO-mluvla (ZO "zo") (gismu "brode"))))))
 
     (makfa-mapti
       "zo broda zei zo brode"
-      '(gerna (ZEI-genpau (ZO-genpau (ZO "zo") (gismu "broda"))
-                          (ZEI "zei")
-                          (ZO-genpau (ZO "zo") (gismu "brode")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (ZO-mluvla (ZO "zo") (gismu "broda"))
+                  (ZEI "zei")
+                  (ZO-mluvla (ZO "zo") (gismu "brode"))))))
 
     (makfa-mapti
       "zoi zei zei zei brode"
-      '(gerna (ZEI-genpau (ZOI-genpau (ZOI "zoi")
-                                      (ZEI "zei")
-                                      ()
-                                      (ZEI "zei"))
-                          (ZEI "zei")
-                          (gismu "brode"))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brode"))))))
 
     (makfa-mapti
       "broda zei zoi zei zei"
-      '(gerna (ZEI-genpau (gismu "broda")
-                          (ZEI "zei")
-                          (ZOI-genpau (ZOI "zoi")
-                                      (ZEI "zei")
-                                      ()
-                                      (ZEI "zei")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "broda"))
+                  (ZEI "zei")
+                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))))))
 
     (makfa-mapti
       "zoi zei zei zei zoi zei zei"
-      '(gerna (ZEI-genpau (ZOI-genpau (ZOI "zoi")
-                                      (ZEI "zei")
-                                      ()
-                                      (ZEI "zei"))
-                          (ZEI "zei")
-                          (ZOI-genpau (ZOI "zoi")
-                                      (ZEI "zei")
-                                      ()
-                                      (ZEI "zei"))))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))
+                  (ZEI "zei")
+                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei")))))))
 
   ;; zoi
   ;;
@@ -2082,15 +2112,15 @@
     (makfa-mapti "" '(gerna)))
 
 
-  (test-BAhE)
-  (test-BU)
-  (test-FAhO)
-  (test-LOhU)
-  (test-SA)
-  (test-SI)
-  (test-SU)
-  (exit)
+  ;(test-BAhE)
+  ;(test-BU)
+  ;(test-FAhO)
+  ;(test-LOhU)
+  ;(test-SA)
+  ;(test-SI)
+  ;(test-SU)
   (test-ZEI)
+  (exit)
   (test-Y)
   (test-ZO)
   (test-ZOI)
