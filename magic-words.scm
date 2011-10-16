@@ -77,6 +77,12 @@
   `(SA-genpau ,mlupau ,@sa))
 
 
+;; One special case: LOhU...LEhU inside a BU or ZEI.
+;;
+(define (paloroda-mluvla-LOhU LOhU-mluvla LEhU-mluvla)
+  `(,@LOhU-mluvla ,LEhU-mluvla))
+
+
 ;;
 ;; GISMU
 ;;
@@ -181,8 +187,11 @@
 (define (LOhU-vimpau LOhU-sa* LOhU-mlupau)
   `(,@(map-apply sa* LOhU-sa*) ,LOhU-mlupau))
 
-(define (LOhU-mluvla LOhU LOhU-genvla* LEhU-vimpau)
-  `(LOhU-mluvla ,LOhU ,@LOhU-genvla* ,@LEhU-vimpau))
+(define (LOhU-mlupau LOhU-mluvla LEhU-vimpau)
+  `(,@LOhU-mluvla ,@LEhU-vimpau))
+
+(define (LOhU-mluvla LOhU LOhU-genvla*)
+  `(LOhU-mluvla ,LOhU ,@LOhU-genvla*))
 
 (define (LOhU-sa SA-genvla* LOhU-sa* SA-genpau)
   `(,@SA-genvla* ,@(map-apply sa* LOhU-sa*) ,SA-genpau))
@@ -418,7 +427,8 @@
     ; bu si
     ; broda bu si
     ; broda zei si
-;
+
+    ;(exit)
 
   ; BAhE tests
   ;
@@ -552,6 +562,9 @@
   ;; LOhU ... LEhU tests
   ;;
   (define (test-LOhU)
+    ; this is not the bu letteral, but rather an unclosed LOhU...LEhU
+    (makfa-narmapti "lo'u bu")
+
     (makfa-mapti
       "le'u bu"
       '(gerna (BU-genpau
@@ -598,9 +611,21 @@
       '(gerna)
       "zei lo'u le'u")
 
-    ; {lo'u ... le'u} cannot be bound to a zei.
-    ;
-    (makfa-narmapti "lo'u le'u zei lo'u le'u")
+    (makfa-mapti
+      "lo'u le'u zei lo'u le'u"
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (LOhU-mluvla (LOhU "lo'u") (LEhU-mluvla (LEhU "le'u")))
+                  (ZEI "zei")
+                  (LOhU-mluvla (LOhU "lo'u") (LEhU-mluvla (LEhU "le'u")))))))
+
+    (makfa-mapti
+      "le'u zei le'u"
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (LEhU-mluvla (LEhU "le'u"))
+                  (ZEI "zei")
+                  (LEhU-mluvla (LEhU "le'u"))))))
 
     (makfa-mapti
       "lo'u le'u"
@@ -798,6 +823,17 @@
               (GISMU-genpau
                 (BAhE-genpau (BAhE-mluvla (BAhE "ba'e")))
                 (GISMU-mluvla (gismu "broda")))))
+
+    (makfa-mapti
+      "broda sa brodi sa brode"
+      '(gerna (GISMU-genpau
+                (SA-genpau
+                  (GISMU-mluvla (gismu "broda"))
+                  (SA-mluvla (SA "sa")))
+                (SA-genpau
+                  (GISMU-mluvla (gismu "brodi"))
+                  (SA-mluvla (SA "sa")))
+                (GISMU-mluvla (gismu "brode")))))
 
 
     ;; backtracking SA
@@ -1807,9 +1843,11 @@
 
     (makfa-mapti
       "broda bu zei brode bu"
-      '(gerna (ZEI-genpau (BU-genpau (gismu "broda") (BU "bu"))
-                          (ZEI "zei")
-                          (BU-genpau (gismu "brode") (BU "bu")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (BU-mluvla (GISMU-mluvla (gismu "broda")) (BU "bu"))
+                  (ZEI "zei")
+                  (BU-mluvla (GISMU-mluvla (gismu "brode")) (BU "bu"))))))
 
     ; fa'o cannot be used in zei.
     ;
@@ -1842,24 +1880,29 @@
 
     (makfa-mapti
       "lo'u broda le'u zei lo'u brode le'u"
-      '(gerna (ZEI-genpau (LOhU-genpau (LOhU "lo'u")
-                                       (gismu "broda")
-                                       (LEhU "le'u"))
-                          (ZEI "zei")
-                          (LOhU-genpau (LOhU "lo'u")
-                                       (gismu "brode")
-                                       (LEhU "le'u")))))
+      '(gerna (ZEI-genpau
+                (ZEI-mlulva
+                  (LOhU-mluvla
+                    (LOhU "lo'u")
+                    (gismu "broda")
+                    (LEhU-mluvla (LEhU "le'u")))
+                  (ZEI "zei")
+                  (LOhU-mluvla (LOhU "lo'u")
+                    (gismu "brode")
+                    (LEhU-mluvla (LEhU "le'u")))))))
 
     (makfa-mapti
       "zei si"
-      '(gerna (SI-genpau (ZEI "zei")
-                         (SI "si"))))
+      '(gerna (SI-genpau
+                (SI-mluvla
+                  (ZEI-mluvla (ZEI "zei")) (SI "si")))))
 
     (makfa-mapti
       "broda zei si"
-      '(gerna (GISMU-genpau (gismu "broda")
-              (SI-genpau (ZEI "zei")
-                         (SI "si")))))
+      '(gerna (GISMU-genpau
+                (GISMU-mluvla (gismu "broda")
+                              (SI-mluvla (ZEI-mluvla (ZEI "zei"))
+                                         (SI "si"))))))
 
     (makfa-mapti
       "zei brode si"
@@ -1877,23 +1920,25 @@
                   (SI "si")))))
 
     (makfa-mapti
-      "zei sa zei"
-      '(gerna (SA-genpau (ZEI "zei") (SA "sa")))
-      "zei")
+      "zei sa"
+      '(gerna (SA-genpau
+                (ZEI-genpau (ZEI-mluvla (ZEI "zei")))
+                (SA-mluvla (SA "sa")))))
+
+    ; SA clauses are part of valid expressions (initial-sa or
+    ; individual word classes.  Since zei by itself is not valid,
+    ; we don't parse the partial SA either.
+    ;
+    (makfa-narmapti "zei sa zei")
 
     (makfa-mapti
       "broda zei sa zei"
-      '(gerna (GISMU-genpau (gismu "broda"))
-              (SA-genpau (ZEI "zei") (SA "sa")))
-      "zei")
+      '(gerna (GISMU-genpau (GISMU-mluvla (gismu "broda"))))
+      "zei sa zei")
 
-    (makfa-mapti
-      "broda zei brode sa zei"
-      '(gerna (SA-genpau (ZEI-genpau (gismu "broda")
-                                     (ZEI "zei")
-                                     (gismu "brode"))
-                         (SA "sa")))
-      "zei")
+    ; See comment above, zei by itself is invalid.
+    ;
+    (makfa-narmapti "broda zei brode sa zei")
 
     (makfa-mapti
       "zei su"
@@ -1994,7 +2039,43 @@
                 (ZEI-mlulva
                   (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))
                   (ZEI "zei")
-                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei")))))))
+                  (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))))))
+
+    (makfa-mapti
+      "broda zei brode sa brodi"
+      '(gerna (SA-genpau
+                (ZEI-genpau
+                  (ZEI-mlulva
+                    (GISMU-mluvla (gismu "broda"))
+                    (ZEI "zei")
+                    (GISMU-mluvla (gismu "brode"))))
+                (SA-mluvla (SA "sa")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brodi")))))
+
+    (makfa-mapti
+      "broda sa brode zei brodi"
+      '(gerna (SA-genpau
+                (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                (SA-mluvla (SA "sa")))
+              (ZEI-genpau
+                (ZEI-mlulva
+                  (GISMU-mluvla (gismu "brode"))
+                  (ZEI "zei")
+                  (GISMU-mluvla (gismu "brodi"))))))
+
+    (makfa-mapti
+      "broda sa brode zei brodi sa brodo"
+      '(gerna (SA-genpau
+                (GISMU-genpau (GISMU-mluvla (gismu "broda")))
+                (SA-mluvla (SA "sa")))
+              (SA-genpau
+                (ZEI-genpau
+                  (ZEI-mlulva
+                    (GISMU-mluvla (gismu "brode"))
+                    (ZEI "zei")
+                    (GISMU-mluvla (gismu "brodi"))))
+                (SA-mluvla (SA "sa")))
+              (GISMU-genpau (GISMU-mluvla (gismu "brodo"))))))
 
   ;; zoi
   ;;
@@ -2112,13 +2193,13 @@
     (makfa-mapti "" '(gerna)))
 
 
-  ;(test-BAhE)
-  ;(test-BU)
-  ;(test-FAhO)
-  ;(test-LOhU)
-  ;(test-SA)
-  ;(test-SI)
-  ;(test-SU)
+  (test-BAhE)
+  (test-BU)
+  (test-FAhO)
+  (test-LOhU)
+  (test-SA)
+  (test-SI)
+  (test-SU)
   (test-ZEI)
   (exit)
   (test-Y)

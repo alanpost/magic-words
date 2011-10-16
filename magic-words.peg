@@ -532,7 +532,10 @@ any-lojban-word <- BAhE
 paloroda-mluvla <- BY-mluvla
                  ; FAhO is not included here, as it takes precedence
                  / GISMU-mluvla
-                 / LOhU-mluvla
+                 ; manually match LEhU-mluvla without performing SA
+                 ; processing.  (as we're part of a larger pseudo-word.)
+                 / LOhU-mluvla LEhU-mluvla
+                -> paloroda-mluvla-LOhU
                  / LEhU-mluvla
                  ; SA, SI, and SU aren't included here, as they
                  ; take precedence.
@@ -616,7 +619,8 @@ BU-mlupau    <- !ZEI-mluvla BU-mluvla
 BU-mluvla    <- BU-genvla ( BAhE-genpau* BU vimcu-genpau? )+
              -> BU-mluvla
               ; a ZEI letteral is not permitted, ZEI takes precedence.
-BU-genvla    <- paloroda-mluvla
+BU-genvla    <- LEhU-mluvla
+              / paloroda-mluvla
 BU-sa        <- ( !( BU-mlupau / BY-mlupau / bu-mlupau ) SA-genvla )*
                 ( ( BU-mlupau / BY-mlupau / bu-mlupau ) BU-sa )*
                 SA-genpau
@@ -670,9 +674,18 @@ LOhU-genpau  <- BAhE-genpau* LOhU-vimpau
              -> LOhU-genpau
 LOhU-vimpau  <- ( LOhU-mlupau LOhU-sa &LOhU-mlupau )* LOhU-mlupau
              -> LOhU-vimpau
-LOhU-mlupau  <- !BU-mluvla !ZEI-mluvla LOhU-mluvla
+;
+; *-mluvla rules cannot do SA processing, as they are used to
+; construct pseudo-words.  When LOhU...LEhU is not part of a
+; pseudo-word, we must do SA processing for LEhU.  LOhU-mlupau
+; matches the LEhU, meaning that any use of LOhU-mluvla must
+; manually match LEhU.
+;
 ; any |vimcu-genpau| will be attached to LEhU-vimpau
-LOhU-mluvla  <- LOhU LOhU-genvla* LEhU-vimpau
+LOhU-mlupau  <- !BU-mluvla !ZEI-mluvla LOhU-mluvla LEhU-vimpau
+             -> LOhU-mlupau
+; When using this rule, LEhU-mluvla must be matched manually.
+LOhU-mluvla  <- LOhU LOhU-genvla*
              -> LOhU-mluvla
 ; XXX: I do want to allow embedded LOhU..LEhU
 LOhU-genvla  <- !LEhU any-lojban-word
@@ -714,7 +727,7 @@ initial-sa  <- ( ( ( BAhE-sa SA-genpau* &BAhE-mlupau
                    / LOhU-sa SA-genpau* &LOhU-mlupau
                    ; XXX: hesitation is probably fine.
                    / SA-sa SA-genpau* !any-lojban-word
-							     ; XXX: bare SU, rather than SU-mlupau?
+                   ; XXX: bare SU, rather than SU-mlupau?
                    / SU-sa SA-genpau* &SU-mlupau
                    / ZEI-sa SA-genpau* &( ZEI-mlupau / zei-mlupau )
                    / ZO-sa SA-genpau* &( ZO-mlupau / &zo-mlupau )
@@ -892,7 +905,7 @@ ZEI-vimpau   <- ( ( ZEI-mlupau / zei-mlupau )
                 ZEI-mlupau
              -> ZEI-vimpau
 ; XXX: do I need to mask BU-mluvla here?
-ZEI-mlupau   <- !BU-mluvla ZEI-mluvla
+ZEI-mlupau   <- ZEI-mluvla
 ZEI-mluvla   <- ZEI-genvla ZEI-fanmo+
              -> ZEI-mluvla
 ; BU must be first in this list, as it is a left-binding magic
