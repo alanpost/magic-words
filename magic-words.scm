@@ -565,14 +565,21 @@
     ; this is not the bu letteral, but rather an unclosed LOhU...LEhU
     (makfa-narmapti "lo'u bu")
 
+    ; an unadorned le'u can become a bu letteral.
+    ;
     (makfa-mapti
       "le'u bu"
       '(gerna (BU-genpau
                 (BU-mluvla (LEhU-mluvla (LEhU "le'u")) (BU "bu")))))
 
-    ; {le'u bu} is the le'u letteral, so we cannot {bu} a quote.
+    ; and an entire lo'u...le'u can be a bu letteral as well.
     ;
-    (makfa-narmapti "lo'u le'u bu")
+    (makfa-mapti
+      "lo'u le'u bu"
+      '(gerna (BU-genpau
+                (BU-mluvla
+                  (LOhU-mluvla (LOhU "lo'u") (LEhU-mluvla (LEhU "le'u")))
+                  (BU "bu")))))
 
     (makfa-mapti
       "lo'u le'u si lo'u le'u"
@@ -1736,58 +1743,14 @@
   (define (test-Y)
     (makfa-mapti
       "y"
-      '(gerna))
+      '(gerna (Y-mluvla (Y "y"))))
     
     (makfa-mapti
       "ybu"
-      '(gerna)))
-
-  ;; zo tests
-  ;;
-  (define (test-ZO)
-    (makfa-narmapti "zo")
-
-    (makfa-mapti
-      "zo bu"
-      '(gerna (ZO-genpau (ZO "zo") (BU "bu"))))
-
-    (makfa-mapti
-      "zo bu bu"
-      '(gerna (BU-genpau (ZO-genpau (ZO "zo") (BU "bu"))
-                         (BU "bu"))))
-
-    (makfa-mapti
-      "zo broda"
-      '(gerna (ZO-genpau (ZO "zo") (gismu "broda"))))
-
-    (makfa-mapti
-      "zo lo'u"
-      '(gerna (ZO-genpau (ZO "zo") (LOhU "lo'u"))))
-
-    (makfa-mapti
-      "zo le'u"
-      '(gerna (ZO-genpau (ZO "zo") (LEhU "le'u"))))
-
-    (makfa-mapti
-      "zo sa"
-      '(gerna (ZO-genpau (ZO "zo") (SA "sa"))))
-
-    (makfa-mapti
-      "zo si"
-      '(gerna (ZO-genpau (ZO "zo") (SI "si"))))
-
-    (makfa-mapti
-      "zo su"
-      '(gerna (ZO-genpau (ZO "zo") (SU "su"))))
-
-    (makfa-mapti
-      "zo zei"
-      '(gerna (ZO-genpau (ZO "zo") (ZEI "zei"))))
-
-    (makfa-mapti
-      "zo zo"
-      '(gerna (ZO-genpau (ZO "zo") (ZO "zo")))))
-
+      '(gerna (BU-genpau
+                (BU-mluvla
+                  (Y-mluvla (Y "y"))
+                  (BU "bu"))))))
 
   ;; zei tests
   ;;
@@ -2077,6 +2040,56 @@
                 (SA-mluvla (SA "sa")))
               (GISMU-genpau (GISMU-mluvla (gismu "brodo"))))))
 
+
+  ;; zo tests
+  ;;
+  (define (test-ZO)
+    (makfa-narmapti "zo")
+
+    (makfa-mapti
+      "zo bu"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (BU "bu")))))
+
+    (makfa-mapti
+      "zo bu bu"
+      '(gerna (BU-genpau
+                (BU-mluvla
+                  (ZO-mluvla (ZO "zo") (BU "bu"))
+                  (BU "bu")))))
+
+    (makfa-mapti
+      "zo broda"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (gismu "broda")))))
+
+    (makfa-mapti
+      "zo lo'u"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (LOhU "lo'u")))))
+
+    (makfa-mapti
+      "zo le'u"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (LEhU "le'u")))))
+
+    (makfa-mapti
+      "zo sa"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (SA "sa")))))
+
+    (makfa-mapti
+      "zo si"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (SI "si")))))
+
+    (makfa-mapti
+      "zo su"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (SU "su")))))
+
+    (makfa-mapti
+      "zo zei"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (ZEI "zei")))))
+
+    (makfa-mapti
+      "zo zo"
+      '(gerna (ZO-genpau (ZO-mluvla (ZO "zo") (ZO "zo"))))))
+
+
   ;; zoi
   ;;
   (define (test-ZOI)
@@ -2098,85 +2111,106 @@
     (makfa-narmapti "zoi zei")
 
     (makfa-mapti "zoi bu bu"
-      '(gerna (ZOI-genpau (ZOI "zoi") (BU "bu") () (BU "bu"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (BU "bu") () (BU "bu")))))
     (makfa-mapti "zoi lo'u lo'u"
-      '(gerna (ZOI-genpau (ZOI "zoi") (LOhU "lo'u") () (LOhU "lo'u"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (LOhU "lo'u") () (LOhU "lo'u")))))
     (makfa-mapti "zoi le'u le'u"
-      '(gerna (ZOI-genpau (ZOI "zoi") (LEhU "le'u") () (LEhU "le'u"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (LEhU "le'u") () (LEhU "le'u")))))
     (makfa-mapti "zoi sa sa"
-      '(gerna (ZOI-genpau (ZOI "zoi") (SA "sa") () (SA "sa"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (SA "sa") () (SA "sa")))))
     (makfa-mapti "zoi si si"
-      '(gerna (ZOI-genpau (ZOI "zoi") (SI "si") () (SI "si"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (SI "si") () (SI "si")))))
     (makfa-mapti "zoi su su"
-      '(gerna (ZOI-genpau (ZOI "zoi") (SU "su") () (SU "su"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (SU "su") () (SU "su")))))
     (makfa-mapti "zoi zo zo"
-      '(gerna (ZOI-genpau (ZOI "zoi") (ZO "zo") () (ZO "zo"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (ZO "zo") () (ZO "zo")))))
     (makfa-mapti "zoi zoi zoi"
-      '(gerna (ZOI-genpau (ZOI "zoi") (ZOI "zoi") () (ZOI "zoi"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (ZOI "zoi") () (ZOI "zoi")))))
     (makfa-mapti "zoi zei zei"
-      '(gerna (ZOI-genpau (ZOI "zoi") (ZEI "zei") () (ZEI "zei"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla (ZOI "zoi") (ZEI "zei") () (ZEI "zei")))))
 
     ; make sure zoi-open takes precedence over all other magic words.
     ;
     (makfa-mapti "zoi broda bu broda"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (gismu "broda")
-                          ((BU "bu"))
-                          (gismu "broda"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (gismu "broda")
+                  ((BU "bu"))
+                  (gismu "broda")))))
 
     (makfa-mapti "zoi fa'o broda fa'o"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (FAhO "fa'o")
-                          ((gismu "broda"))
-                          (FAhO "fa'o"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (FAhO "fa'o")
+                  ((gismu "broda"))
+                  (FAhO "fa'o")))))
 
     (makfa-mapti "zoi lo'u le'u lo'u"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (LOhU "lo'u")
-                          ((LEhU "le'u"))
-                          (LOhU "lo'u"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (LOhU "lo'u")
+                  ((LEhU "le'u"))
+                  (LOhU "lo'u")))))
 
     (makfa-mapti "zoi sa zoi sa"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (SA "sa")
-                          ((ZOI "zoi"))
-                          (SA "sa"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (SA "sa")
+                  ((ZOI "zoi"))
+                  (SA "sa")))))
 
     (makfa-mapti "zoi si zoi si"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (SI "si")
-                          ((ZOI "zoi"))
-                          (SI "si"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (SI "si")
+                  ((ZOI "zoi"))
+                  (SI "si")))))
 
     (makfa-mapti "zoi su zoi su"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (SU "su")
-                          ((ZOI "zoi"))
-                          (SU "su"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (SU "su")
+                  ((ZOI "zoi"))
+                  (SU "su")))))
 
     (makfa-mapti "zoi zo broda zo"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (ZO "zo")
-                          ((gismu "broda"))
-                          (ZO "zo"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (ZO "zo")
+                  ((gismu "broda"))
+                  (ZO "zo")))))
 
     (makfa-mapti "zoi zoi broda broda zoi"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (ZOI "zoi")
-                          ((gismu "broda") (gismu "broda"))
-                          (ZOI "zoi"))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (ZOI "zoi")
+                  ((gismu "broda") (gismu "broda"))
+                  (ZOI "zoi")))))
 
     (makfa-mapti "zoi zei zoi zei"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (ZEI "zei")
-                          ((ZOI "zoi"))
-                          (ZEI "zei"))))
-
-    (makfa-mapti "zoi zei zoi zei"
-      '(gerna (ZOI-genpau (ZOI "zoi")
-                          (ZEI "zei")
-                          ((ZOI "zoi"))
-                          (ZEI "zei")))))
+      '(gerna (ZOI-genpau
+                (ZOI-mluvla
+                  (ZOI "zoi")
+                  (ZEI "zei")
+                  ((ZOI "zoi"))
+                  (ZEI "zei"))))))
 
 
   ;; basic gismu test
@@ -2184,7 +2218,7 @@
   (define (test-gismu)
     (makfa-mapti
       "broda"
-      '(gerna (GISMU-genpau (gismu "broda")))))
+      '(gerna (GISMU-genpau (GISMU-mluvla (gismu "broda"))))))
 
 
   ;; test the empty string.
@@ -2200,9 +2234,8 @@
   (test-SA)
   (test-SI)
   (test-SU)
-  (test-ZEI)
-  (exit)
   (test-Y)
+  (test-ZEI)
   (test-ZO)
   (test-ZOI)
   (test-gismu)
